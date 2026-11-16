@@ -8,6 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(GNUInstallDirs)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(LumenQml)
+include(LumenApp)
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS
     Core Gui Qml Quick QuickControls2 QuickTemplates2 ShaderTools DBus Svg Concurrent Network Test QuickTest)

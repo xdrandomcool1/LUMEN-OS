@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Calendar
+GenericName=Calendar
+Exec=lumen-calendar
+Icon=lumen-calendar
+Terminal=false
+Categories=Office;Calendar;
+Keywords=events;schedule;date;

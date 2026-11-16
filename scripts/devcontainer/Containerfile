@@ -41,7 +41,7 @@ RUN dnf -y install --setopt=install_weak_deps=False \
       plasma-wayland-protocols-devel wayland-protocols-devel \
       powerdevil pipewire-pulseaudio xdg-desktop-portal-kde kscreen \
       flatpak flatpak-devel libdbusmenu-lxqt-devel \
-      calamares plasma-integration breeze-icon-theme sway grim \
+      calamares plasma-integration breeze-icon-theme sway grim kf6-syntax-highlighting \
     && dnf clean all
 
 ENV QT_QPA_PLATFORM=offscreen \

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=App Store
+GenericName=Software Center
+Comment=Find, install and update applications
+Exec=lumen-store
+Icon=lumen-store
+Categories=System;PackageManager;
+Keywords=apps;install;flatpak;flathub;software;update;

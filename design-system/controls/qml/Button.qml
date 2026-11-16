@@ -10,7 +10,7 @@ import Lumen.Glass
 T.Button {
     id: control
     enum Kind { Bordered, Prominent, Plain, Glass, Destructive }
-    enum Size { Small, Regular, Large }
+    enum ButtonSize { Small, Regular, Large }
 
     property int kind: Button.Bordered
     property int size: Button.Regular

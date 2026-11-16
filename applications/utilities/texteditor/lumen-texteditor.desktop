@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Text Editor
+GenericName=Text Editor
+Exec=lumen-texteditor %U
+Icon=lumen-texteditor
+Terminal=false
+Categories=Utility;TextEditor;
+Keywords=text;editor;notes;code;
+MimeType=text/plain;text/markdown;application/x-shellscript;

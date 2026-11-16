@@ -8,7 +8,7 @@ if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
 fi
 TESTS=1
 if [ "${1:-}" = "--no-tests" ]; then TESTS=0; shift; fi
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr "$@"
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc "$@"
 cmake --build build
 if [ "$TESTS" = 1 ]; then
     QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure

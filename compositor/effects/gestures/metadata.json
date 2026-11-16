@@ -1,0 +1,10 @@
+{
+    "KPlugin": {
+        "Id": "lumen_gestures",
+        "Name": "LUMEN Gestures",
+        "Description": "Three-finger swipes for Mission Control and desktop switching; pinch for overview.",
+        "Category": "Tools",
+        "EnabledByDefault": true,
+        "License": "GPL-3.0-or-later"
+    }
+}

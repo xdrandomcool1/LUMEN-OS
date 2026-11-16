@@ -1,0 +1,12 @@
+[Libinput][Defaults]
+TapToClick=true
+NaturalScroll=true
+ClickMethod=2
+
+[Keyboard]
+RepeatDelay=500
+RepeatRate=30
+
+[Mouse]
+cursorTheme=breeze_cursors
+cursorSize=24

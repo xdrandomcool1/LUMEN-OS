@@ -19,6 +19,8 @@
 #   --wait SECONDS    settle time before capture (default 6)
 #   --shot FILE       capture the workspace into FILE (repeatable with --then)
 #   --capture P=FILE  open shell panel P (or "none"), then capture FILE (repeatable)
+#   --install         install the build tree into the container's /usr first
+#                     (system integration: KWin plugins, /etc/xdg defaults)
 #   --interactive     keep running until killed
 set -euo pipefail
 if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
@@ -43,6 +45,7 @@ while [ $# -gt 0 ]; do
         --shot) SHOTS+=("$2"); shift 2;;
         --capture) CAPTURES+=("$2"); shift 2;;
         --interactive) INTERACTIVE=1; shift;;
+        --install) cmake --install /src/build --prefix /usr >/dev/null; shift;;
         *) echo "unknown option $1"; exit 2;;
     esac
 done

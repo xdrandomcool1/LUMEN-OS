@@ -1,0 +1,4 @@
+[Daemon]
+Autolock=true
+Timeout=5
+LockOnResume=true

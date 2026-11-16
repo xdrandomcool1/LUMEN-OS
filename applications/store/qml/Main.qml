@@ -71,7 +71,7 @@ AppWindow {
         Item {
             anchors.right: parent.right; anchors.rightMargin: 12; anchors.verticalCenter: parent.verticalCenter
             width: 76; height: 26
-            Button { anchors.fill: parent; visible: !card.busy; size: Button.Small; kind: card.installed ? Button.Bordered : Button.Prominent
+            Button { anchors.fill: parent; visible: !card.busy; size: Button.Small; kind: card.installed ? 0 /* Button.Bordered */ : 1 /* Button.Prominent */
                      text: card.installed ? qsTr("Open") : qsTr("Get")
                      onClicked: card.installed ? Flatpak.launch(card.app.appId) : Flatpak.install(card.app.appId) }
             ProgressBar { anchors.centerIn: parent; width: 70; visible: card.busy; value: Flatpak.progress / 100; indeterminate: Flatpak.progress === 0 }

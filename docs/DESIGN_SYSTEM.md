@@ -128,3 +128,12 @@ Rules: entrances use springs (interruptible, velocity preserving); exits are
 ~30 % faster than entrances; nothing animates longer than 600 ms except the
 boot/login sequence; with *Reduce motion* all spatial transitions become
 120 ms cross-fades.
+
+## 6. Implementation notes
+
+* Enums declared in QML controls whose root is a C++ template type (e.g.
+  `Button.Kind`) resolve in plain bindings (`kind: Button.Prominent`) but
+  evaluate to `undefined` inside JavaScript expressions on Qt 6.11. Use plain
+  bindings, or numeric values with a comment, in ternaries.
+* Popups (`Menu`, `ToolTip`) are not Items: resolve the window with
+  `control.parent.Window.window`, never `Window.window`.

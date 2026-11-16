@@ -1,0 +1,8 @@
+build/
+build-*/
+/out/
+*.iso
+__pycache__/
+wallpapers/rendered/
+system-services/*/target/
+.cache/

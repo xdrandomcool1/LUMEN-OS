@@ -1,0 +1,36 @@
+# LUMEN OS development / build container.
+# Mirrors the target distribution (Fedora + KWin 6 + Qt 6) so everything that
+# is compiled here links against the exact libraries shipped on the ISO.
+ARG FEDORA_VERSION=45
+FROM registry.fedoraproject.org/fedora:${FEDORA_VERSION}
+
+# Optional extra trust anchors (e.g. a TLS-intercepting corporate proxy).
+# Put *.crt files into scripts/devcontainer/extra-ca/ before building.
+COPY extra-ca/ /etc/pki/ca-trust/source/anchors/
+RUN update-ca-trust
+
+RUN dnf -y install --setopt=install_weak_deps=False \
+      cmake ninja-build gcc-c++ extra-cmake-modules pkgconf-pkg-config git \
+      qt6-qtbase-devel qt6-qtbase-private-devel qt6-qtdeclarative-devel \
+      qt6-qtshadertools-devel qt6-qtwayland-devel qt6-qtsvg-devel \
+      qt6-qtmultimedia-devel qt6-qttools-devel qt6-qtbase-gui \
+      layer-shell-qt-devel \
+      kf6-kwindowsystem-devel kf6-kglobalaccel-devel kf6-kconfig-devel \
+      kf6-kcoreaddons-devel kf6-ki18n-devel kf6-kcrash-devel \
+      kwin kwin-devel libepoxy-devel wayland-devel \
+      libvterm-devel \
+      mesa-dri-drivers mesa-libEGL mesa-libgbm \
+      dbus-daemon dbus-tools xorg-x11-server-Xvfb xdotool \
+      rust cargo rustfmt clippy dbus-devel \
+      rpm-build rpmdevtools createrepo_c \
+      python3-pillow python3-numpy \
+      rsms-inter-fonts rsms-inter-vf-fonts jetbrains-mono-fonts-all google-noto-color-emoji-fonts \
+      sddm plymouth-plugin-script plymouth-scripts \
+      librsvg2-tools ImageMagick ffmpeg-free \
+      pipewire-utils wireplumber upower bluez NetworkManager \
+    && dnf clean all
+
+ENV QT_QPA_PLATFORM=offscreen \
+    QT_FORCE_STDERR_LOGGING=1 \
+    LANG=C.UTF-8
+WORKDIR /src

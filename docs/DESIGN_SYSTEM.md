@@ -1,0 +1,130 @@
+# LUMEN OS — Design System
+
+The visual target is the modern macOS "Liquid Glass" era desktop: a quiet,
+content-first layout where controls float on layered, light-bending glass.
+LUMEN reproduces those *proportions, materials and motion* with original
+artwork, open fonts and its own code. No Apple artwork, fonts, icons, sounds
+or trademarks are used or redistributed.
+
+All values are in logical pixels (pt). The canonical machine-readable source is
+`design-system/qml/Lumen/Design/Tokens.qml` (+ `Motion`, `Glass` modules);
+this document explains them.
+
+## 1. Typography
+
+| Role            | Family                    | Size | Weight    | Tracking |
+|-----------------|---------------------------|------|-----------|----------|
+| Menu bar        | Inter Variable            | 13   | 500 / 700 (app name) | -0.08 |
+| Body            | Inter Variable            | 13   | 400       | -0.08    |
+| Callout         | Inter Variable            | 12   | 400       | 0        |
+| Caption         | Inter Variable            | 11   | 400       | +0.06    |
+| Headline        | Inter Variable            | 13   | 600       | -0.08    |
+| Title 3         | Inter Variable            | 15   | 600       | -0.23    |
+| Title 2         | Inter Variable            | 17   | 600       | -0.43    |
+| Title 1         | Inter Variable            | 22   | 700       | -0.26    |
+| Large title     | Inter Variable            | 26   | 700       | +0.22    |
+| Clock widget    | Inter Variable (display)  | 56–96| 600       | -1.0     |
+| Monospace       | JetBrains Mono            | 12–13| 400       | 0        |
+
+Inter is the closest freely licensed match for the neo-grotesque system face
+(similar x-height, tight default tracking). Tracking values replicate the
+"optical size" tightening of the reference typography.
+
+## 2. Geometry
+
+| Element                       | Value                                         |
+|-------------------------------|-----------------------------------------------|
+| Menu bar height               | 24 (34 on HiDPI notched panels)               |
+| Menu bar item padding         | 10 horizontal, 3 vertical, radius 6 highlight |
+| Menu (dropdown) radius        | 12 outer, 6 item highlight, 5 inset           |
+| Menu item height              | 22, separator 11 (1px line)                   |
+| Dock tile size (default)      | 54 icon in 64 tile, magnified up to 96        |
+| Dock padding / radius         | 6 inner, radius = (tile + 2·6) · 0.42         |
+| Dock bottom gap               | 8                                             |
+| Running indicator             | 4 × 4 dot, 3 below tile                       |
+| Window corner radius          | 16 (title bar), 24 (unified toolbar)          |
+| Title bar height              | 32; with toolbar 52                           |
+| Traffic lights                | Ø 12, centre spacing 20, inset 14 from left   |
+| Sidebar (inset, floating)     | width 220, inset 8, radius 18                  |
+| Control Center                | width 324, padding 12, module radius 20, gap 12 |
+| Spotlight                     | width 680, field height 54, radius 27 (capsule) |
+| Notification banner           | width 352, radius 22, padding 14               |
+| Widgets                       | small 164², medium 344 × 164, radius 22        |
+| App icon grid (squircle)      | superellipse n = 5, 82 % content box           |
+
+## 3. Color
+
+### Semantic colors
+
+| Token               | Light            | Dark             |
+|---------------------|------------------|------------------|
+| `label`             | #000000 · 85 %   | #FFFFFF · 85 %   |
+| `secondaryLabel`    | #000000 · 50 %   | #FFFFFF · 55 %   |
+| `tertiaryLabel`     | #000000 · 26 %   | #FFFFFF · 25 %   |
+| `separator`         | #000000 · 10 %   | #FFFFFF · 12 %   |
+| `windowBackground`  | #F5F5F7          | #1E1E20          |
+| `contentBackground` | #FFFFFF          | #161618          |
+| `controlFill`       | #000000 · 5 %    | #FFFFFF · 10 %   |
+| `accent` (blue)     | #0A7CFF          | #0A84FF          |
+
+Accent palette: blue `#0A84FF`, purple `#BF5AF2`, pink `#FF375F`, red `#FF453A`,
+orange `#FF9F0A`, yellow `#FFD60A`, green `#30D158`, graphite `#8E8E93`.
+
+Window controls: close `#FF5F57`, minimize `#FEBC2E`, zoom `#28C840`
+(inactive windows: `#D0D0D2` light / `#4A4A4D` dark).
+
+## 4. Liquid Glass materials
+
+A glass surface is rendered in five ordered layers:
+
+1. **Backdrop** – the content behind the surface, blurred with a dual-Kawase
+   filter (radius set per material) and slightly saturated (vibrancy).
+2. **Lensing / refraction** – near the rounded edge the backdrop is sampled
+   along the surface normal, displaced by `refraction · f(d)` where `d` is the
+   signed distance to the edge and `f` a smooth convex-lens profile. A small
+   per-channel offset adds chromatic dispersion.
+3. **Tint** – a material color mixed in with an *adaptive* opacity: the shader
+   measures backdrop luminance and pushes it towards the material's target
+   luminance so text stays legible on any wallpaper.
+4. **Specular + rim light** – a directional highlight band on the edge facing
+   the light (top-left by default) and a thinner counter-highlight on the
+   opposite edge; plus a soft inner glow.
+5. **Shadow** – an outer, very soft ambient shadow + a tighter contact shadow
+   (drawn as a separate SDF pass outside the surface).
+
+| Material      | Blur | Saturation | Tint (light / dark)          | Tint α | Refraction | Specular | Use                          |
+|---------------|------|------------|------------------------------|--------|-----------|----------|------------------------------|
+| `ultraThin`   | 18   | 1.6        | #FFFFFF / #1C1C1E            | 0.08   | 0.9       | 0.9      | Dock, floating controls      |
+| `thin`        | 24   | 1.5        | #F8F8FA / #222224            | 0.22   | 0.7       | 0.7      | Menus, popovers              |
+| `regular`     | 30   | 1.4        | #F2F2F5 / #202022            | 0.42   | 0.55      | 0.55     | Control Center, Notification |
+| `frosted`     | 44   | 1.25       | #EFEFF2 / #1A1A1C            | 0.62   | 0.35      | 0.4      | Sidebars, Spotlight results  |
+| `dark`        | 30   | 1.3        | #0E0E10                      | 0.55   | 0.55      | 0.45     | HUDs, OSD, login             |
+| `light`       | 30   | 1.3        | #FFFFFF                      | 0.55   | 0.55      | 0.6      | Light-only floating panels   |
+| `floating`    | 22   | 1.55       | #FFFFFF / #2A2A2C            | 0.16   | 1.0       | 1.0      | Spotlight field, toolbar pills|
+| `active`      | 22   | 1.55       | accent                       | 0.30   | 0.8       | 0.9      | Selected/pressed glass       |
+
+Accessibility: *Reduce transparency* replaces layers 1–2 with an opaque tint;
+*Increase contrast* adds a 1 px `label·30%` border and raises tint α by 0.25.
+
+## 5. Motion
+
+| Token                 | Spring (stiffness, damping, mass) | Approx. duration | Use                        |
+|-----------------------|-----------------------------------|------------------|----------------------------|
+| `snappy`              | 520, 42, 1                        | 0.25 s           | Hover, toggles, presses    |
+| `smooth`              | 300, 34, 1                        | 0.38 s           | Panels, menus              |
+| `bouncy`              | 380, 22, 1                        | 0.55 s           | Dock launch bounce, OSD    |
+| `gentle`              | 170, 26, 1                        | 0.6 s            | Window open, overview      |
+
+| Easing token    | Bezier                     | Use                     |
+|-----------------|----------------------------|-------------------------|
+| `standard`      | (0.25, 0.1, 0.25, 1.0)     | Fades                   |
+| `emphasized`    | (0.2, 0.0, 0.0, 1.0)       | Panel entrance          |
+| `exit`          | (0.4, 0.0, 1.0, 1.0)       | Dismissals              |
+
+Durations: `instant` 90 ms · `fast` 160 ms · `normal` 240 ms · `slow` 360 ms ·
+`window` 280 ms (open), 200 ms (close) · `minimize` 420 ms.
+
+Rules: entrances use springs (interruptible, velocity preserving); exits are
+~30 % faster than entrances; nothing animates longer than 600 ms except the
+boot/login sequence; with *Reduce motion* all spatial transitions become
+120 ms cross-fades.

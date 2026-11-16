@@ -22,9 +22,10 @@ qt_add_qml_module(LumenSystem
         src/sysstats.h src/sysstats.cpp
         src/appsmodel.h src/appsmodel.cpp
         src/filesearch.h src/filesearch.cpp
+        src/themesync.h src/themesync.cpp
 )
 target_include_directories(LumenSystem PUBLIC src)
-target_link_libraries(LumenSystem PUBLIC Qt6::Core Qt6::Gui Qt6::Qml Qt6::DBus Qt6::Concurrent
+target_link_libraries(LumenSystem PUBLIC LumenDesign Qt6::Core Qt6::Gui Qt6::Qml Qt6::DBus Qt6::Concurrent
     KF6::KIOGui KF6::KIOCore KF6::Service KF6::NetworkManagerQt KF6::PulseAudioQt)
 set_target_properties(LumenSystem PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
 lumen_install_qml_module(LumenSystem LumenSystemPlugin Lumen/System)

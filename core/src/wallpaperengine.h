@@ -28,6 +28,7 @@ class WallpaperEngine : public QObject
     Q_PROPERTY(qreal luminance READ luminance NOTIFY sourceChanged)
     Q_PROPERTY(QVariantList wallpapers READ wallpapers NOTIFY collectionChanged)
     Q_PROPERTY(QStringList dynamicSets READ dynamicSets NOTIFY collectionChanged)
+    Q_PROPERTY(QString directory READ directory CONSTANT)
 
 public:
     static WallpaperEngine *instance();
@@ -43,6 +44,7 @@ public:
     Q_INVOKABLE void setStatic(const QString &pathOrName);
     Q_INVOKABLE void setDynamic(const QString &set);
     static QString dataDir();
+    QString directory() const { return dataDir(); }
 
 Q_SIGNALS:
     void sourceChanged();

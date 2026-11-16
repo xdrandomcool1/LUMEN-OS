@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // lumen-shell — the LUMEN desktop shell (menu bar, Dock, panels, wallpaper).
 #include "shellcontroller.h"
+#include "themesync.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -64,6 +65,9 @@ int main(int argc, char **argv)
         if (!NotificationManager::Server::self().init())
             qWarning("Could not register the notification server (another one is running?)");
     }
+
+    // Keep third-party toolkits in sync with LUMEN's appearance.
+    Lumen::ThemeSync themeSync;
 
     QQmlApplicationEngine engine;
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app, [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);

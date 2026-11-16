@@ -48,8 +48,8 @@ void SysStats::sample()
     QFile mem(QStringLiteral("/proc/meminfo"));
     if (mem.open(QIODevice::ReadOnly)) {
         qint64 total = 0, avail = 0;
-        while (!mem.atEnd()) {
-            const QByteArray l = mem.readLine();
+        // /proc files report size 0: read everything, then parse lines.
+        for (const QByteArray &l : mem.readAll().split('\n')) {
             if (l.startsWith("MemTotal:")) total = l.simplified().split(' ').value(1).toLongLong() * 1024;
             else if (l.startsWith("MemAvailable:")) avail = l.simplified().split(' ').value(1).toLongLong() * 1024;
         }
@@ -58,8 +58,7 @@ void SysStats::sample()
     QFile net(QStringLiteral("/proc/net/dev"));
     if (net.open(QIODevice::ReadOnly)) {
         quint64 rx = 0, tx = 0;
-        while (!net.atEnd()) {
-            const QByteArray l = net.readLine();
+        for (const QByteArray &l : net.readAll().split('\n')) {
             const int c = l.indexOf(':');
             if (c < 0) continue;
             const QByteArray ifname = l.left(c).trimmed();

@@ -30,6 +30,20 @@ RUN dnf -y install --setopt=install_weak_deps=False \
       pipewire-utils wireplumber upower bluez NetworkManager \
     && dnf clean all
 
+# Shell integration libraries (Plasma libraries are used as building blocks;
+# plasmashell itself is not part of LUMEN).
+RUN dnf -y install --setopt=install_weak_deps=False \
+      plasma-workspace-devel plasma-workspace-libs \
+      kf6-networkmanager-qt-devel kf6-bluez-qt-devel pulseaudio-qt-qt6-devel \
+      kf6-kservice-devel kf6-kio-devel kf6-solid-devel kf6-kidletime-devel \
+      kf6-kdbusaddons-devel kf6-knotifications-devel kf6-kpackage-devel \
+      libkscreen-devel kf6-kirigami-devel kf6-kitemmodels-devel \
+      plasma-wayland-protocols-devel wayland-protocols-devel \
+      powerdevil pipewire-pulseaudio xdg-desktop-portal-kde kscreen \
+      flatpak flatpak-devel libdbusmenu-lxqt-devel \
+      calamares plasma-integration breeze-icon-theme sway grim \
+    && dnf clean all
+
 ENV QT_QPA_PLATFORM=offscreen \
     QT_FORCE_STDERR_LOGGING=1 \
     LANG=C.UTF-8

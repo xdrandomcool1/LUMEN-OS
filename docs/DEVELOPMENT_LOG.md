@@ -1,0 +1,45 @@
+# LUMEN OS — Development Log
+
+Chronological engineering log. Every claim here is backed by a build, test
+run or screenshot produced in the dev container (`scripts/devcontainer`).
+
+## Environment findings (2026-11-16)
+
+* Host: cloud container, 4 vCPU / 15 GiB, no GPU, no `/dev/dri`, no KVM.
+  Docker works (privileged mode, loop devices available).
+* Target base: **Fedora 45** — Qt 6.11.2, KWin 6.8.3, LayerShellQt 6.8.3,
+  SDDM 0.21, Plymouth 26, Rust 1.99.
+* All compilation happens in `lumen-dev:45` (Fedora 45) so binaries link
+  against exactly what ships on the ISO.
+
+### Problems found and how they were solved
+| Problem | Root cause | Resolution |
+|---|---|---|
+| `dnf` TLS failures in container build | TLS-intercepting proxy | `scripts/devcontainer/extra-ca/` trust anchors |
+| KWin "Operation not permitted" | `kwin_wayland` has file capability CAP_SYS_NICE | run container with `--cap-add SYS_NICE` |
+| QML errors invisible | Fedora Qt logs to journald when stderr is not a TTY | `QT_FORCE_STDERR_LOGGING=1` in dev env |
+| KWin segfault at start (`QStyleHintsPrivate::update`) | Qt 6.11's built-in `QKdeTheme` emits a theme change before style hints exist when `KDE_FULL_SESSION` is set | ship `plasma-integration` and set `QT_QPA_PLATFORMTHEME=kde` (also needed for global menus) |
+| KWin segfault on screenshot (`RenderDevice::eglContext`) | no render node → KWin's virtual backend composites with QPainter; the screenshot plugin assumes EGL | visual QA uses sway (wlroots headless + pixman) + `grim`; KWin used for integration runs |
+| Shell segfault on start | `Qt.application.screens[i]` is a `QQuickScreenInfo`, not a `QScreen` | `LayerSurface.screen` accepts both and resolves by name |
+
+## Milestone 1 — progress
+
+* ☑ `Lumen.Motion` spring engine, `Lumen.Design` tokens/appearance/symbols,
+  `Lumen.Glass` renderer (dual-Kawase pyramid + composite shader), verified by
+  `tests/visual/glass-materials.qml` renders in dark and light appearance.
+* ☑ `Lumen.Controls` — 25 controls + `AppWindow` chrome, verified by
+  `tests/visual/controls-gallery.qml`.
+* ☑ Original wallpaper collection (procedural, 11 wallpapers + dynamic set).
+* ☑ Original icon theme (squircle app icons, folders, Trash).
+* ☑ `lumen-shell` on a live Wayland compositor: wallpaper/desktop widgets
+  (background layer), transparent adaptive menu bar (top layer, exclusive
+  zone), Liquid Glass Dock (magnification, indicators, context menus,
+  auto-hide, Trash), overlay panel host (Control Center, Spotlight,
+  Notification Center, menus). Screenshots: `docs/screenshots/m1-*.png`.
+* ☑ `lumen-screenshot` (KWin ScreenShot2 client, CLI + GUI).
+
+### Verification limits (honest notes)
+* Running-app indicators, window lists and KWin blur cannot be exercised in
+  the sway QA session (they need KWin's privileged protocols, and KWin can't
+  use OpenGL without a GPU here). They are covered by code paths tested in
+  the KWin integration run (shell starts, registers D-Bus, loads all panels).

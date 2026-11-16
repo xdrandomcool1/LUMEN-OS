@@ -18,7 +18,8 @@ layout(std140, binding = 0) uniform buf {
     float radius;        // corner radius
     float smoothness;    // corner exponent: 2 = circular, ~2.6 = continuous
     vec4 backdropRect;   // item rect in backdrop UV space (u, v, du, dv)
-    float hasBackdrop;   // 1: in-scene backdrop, 0: compositor provides blur
+    float hasBackdrop;   // 1: in-scene backdrop, 0: none
+    float compositorBlur; // 1: compositor blurs behind (no in-scene backdrop)
     float refraction;    // max rim displacement (px)
     float lensWidth;     // width of the refracting bevel (px)
     float dispersion;    // chromatic dispersion (0..1)
@@ -126,7 +127,8 @@ void main()
             // Compositor-blur mode: the backdrop is blurred behind us by
             // the compositor; we only contribute tint and light.
             col = tint.rgb;
-            alpha = clamp(tint.a + 0.12, 0.0, 1.0);
+            alpha = compositorBlur > 0.5 ? clamp(tint.a + 0.18, 0.0, 1.0)
+                                         : clamp(max(tint.a, 0.86), 0.0, 1.0);
         }
 
         // Bevel shading: light side brightens, far side darkens subtly.

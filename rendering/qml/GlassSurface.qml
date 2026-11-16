@@ -35,6 +35,9 @@ Item {
     //! Optional tint override; alpha < 0 keeps the material tint.
     property color tintColor: "transparent"
     property real tintAlpha: -1
+    //! Without an in-scene backdrop: true when the compositor blurs behind
+    //! this surface (translucent tint), false for an opaque-ish material.
+    property bool compositorBlur: false
     property vector2d lightDirection: Qt.vector2d(0.38, 0.92).normalized()
 
     default property alias contentData: content.data
@@ -77,6 +80,7 @@ Item {
         property real smoothness: root.smoothness
         property rect backdropRect: tracker.normalizedRect
         property real hasBackdrop: inScene ? 1 : 0
+        property real compositorBlur: root.compositorBlur ? 1 : 0
         property real refraction: root.params.refraction * root.refractionScale * Appearance.glassIntensity
         property real lensWidth: root.params.lensWidth
         property real dispersion: root.params.dispersion

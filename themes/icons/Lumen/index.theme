@@ -1,0 +1,21 @@
+[Icon Theme]
+Name=Lumen
+Comment=LUMEN OS icon theme
+Inherits=breeze,hicolor
+Example=lumen-finder
+DisplayDepth=32
+Directories=scalable/apps,scalable/places
+
+[scalable/apps]
+Size=128
+MinSize=16
+MaxSize=1024
+Context=Applications
+Type=Scalable
+
+[scalable/places]
+Size=128
+MinSize=16
+MaxSize=1024
+Context=Places
+Type=Scalable

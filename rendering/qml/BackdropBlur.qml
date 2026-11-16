@@ -17,6 +17,8 @@ Item {
     //! Blur spread multiplier. 1.0 ≈ 30 px radius at the source scale.
     property real strength: 1.0
     property bool live: true
+    //! Hide the source from the visible scene (backdrop-only items).
+    property bool hideSource: false
 
     //! Blurred backdrop texture (half resolution).
     readonly property alias texture: out4
@@ -35,7 +37,7 @@ Item {
         sourceItem: root.source
         textureSize: Qt.size(Math.ceil(root.srcW), Math.ceil(root.srcH))
         live: root.live
-        hideSource: false
+        hideSource: root.hideSource
         smooth: true
         visible: false
         wrapMode: ShaderEffectSource.ClampToEdge

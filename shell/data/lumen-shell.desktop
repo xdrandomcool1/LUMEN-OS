@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=LUMEN Shell
+Comment=Menu bar, Dock and system panels
+Exec=lumen-shell
+Icon=lumen-logo
+NoDisplay=true
+OnlyShowIn=LUMEN;KDE;
+X-KDE-autostart-phase=0
+# Privileged Wayland interfaces KWin grants to this executable:
+# window list for the Dock, screen edges for auto-hide, and screenshots.
+X-KDE-Wayland-Interfaces=org_kde_plasma_window_management,org_kde_kwin_keystate,zkde_screencast_unstable_v1,org_kde_plasma_activation_feedback
+X-KDE-DBUS-Restricted-Interfaces=org.kde.KWin.ScreenShot2

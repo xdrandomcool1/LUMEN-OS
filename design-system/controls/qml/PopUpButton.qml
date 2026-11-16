@@ -54,7 +54,7 @@ T.ComboBox {
         }
         background: GlassSurface {
             radius: 12; material: Glass.Thin
-            backdrop: (Window.window && Window.window.lumenBackdrop) ? Window.window.lumenBackdrop : null
+            backdrop: (control.Window.window && control.Window.window.lumenBackdrop) ? control.Window.window.lumenBackdrop : null
         }
     }
 }

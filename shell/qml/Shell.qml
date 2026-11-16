@@ -2,6 +2,7 @@
 // Root of lumen-shell: one set of surfaces per screen.
 import QtQuick
 import Lumen.Shell
+import Lumen.System
 
 QtObject {
     id: shell

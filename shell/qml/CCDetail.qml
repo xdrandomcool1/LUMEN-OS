@@ -4,6 +4,7 @@ import QtQuick
 import Lumen.Design
 import Lumen.Controls
 import Lumen.Shell
+import Lumen.System
 
 Column {
     id: d

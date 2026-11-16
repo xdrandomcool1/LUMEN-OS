@@ -6,6 +6,7 @@ import Lumen.Design
 import Lumen.Motion
 import Lumen.Controls
 import Lumen.Shell
+import Lumen.System
 import Lumen.Shell.Plasma
 
 Window {

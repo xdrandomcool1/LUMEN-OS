@@ -15,7 +15,7 @@ T.ToolTip {
     contentItem: LText { text: control.text; style: LText.Callout; wrapMode: Text.Wrap; elide: Text.ElideNone }
     background: GlassSurface {
         radius: 8; material: Glass.Thin
-        backdrop: (Window.window && Window.window.lumenBackdrop) ? Window.window.lumenBackdrop : null
+        backdrop: (control.parent && control.parent.Window.window && control.parent.Window.window.lumenBackdrop) ? control.parent.Window.window.lumenBackdrop : null
         shadowScale: 0.5; shadowOffsetY: 3
     }
     enter: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Motion.fast } }

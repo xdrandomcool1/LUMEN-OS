@@ -5,6 +5,7 @@
 import QtQuick
 import Lumen.Motion
 import Lumen.Shell
+import Lumen.System
 
 Item {
     id: root

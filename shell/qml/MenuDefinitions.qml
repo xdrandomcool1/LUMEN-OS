@@ -4,6 +4,7 @@
 pragma Singleton
 import QtQuick
 import Lumen.Shell
+import Lumen.System
 import Lumen.Shell.Plasma
 
 QtObject {

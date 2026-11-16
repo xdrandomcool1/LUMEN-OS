@@ -2,6 +2,7 @@
 // All shell surfaces of one screen.
 import QtQuick
 import Lumen.Shell
+import Lumen.System
 
 QtObject {
     id: s

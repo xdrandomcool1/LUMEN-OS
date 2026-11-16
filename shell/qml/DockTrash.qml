@@ -7,6 +7,7 @@ import Lumen.Design
 import Lumen.Motion
 import Lumen.Glass
 import Lumen.Shell
+import Lumen.System
 
 Item {
     id: trash

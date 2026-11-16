@@ -9,7 +9,7 @@ import Lumen.Glass
 
 T.Menu {
     id: control
-    property BackdropBlur backdrop: (Window.window && Window.window.lumenBackdrop) ? Window.window.lumenBackdrop : null
+    property BackdropBlur backdrop: (control.parent && control.parent.Window.window && control.parent.Window.window.lumenBackdrop) ? control.parent.Window.window.lumenBackdrop : null
     property real minimumWidth: 180
 
     implicitWidth: Math.max(minimumWidth, contentWidth + leftPadding + rightPadding)

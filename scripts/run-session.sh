@@ -48,11 +48,25 @@ while [ $# -gt 0 ]; do
 done
 
 B=/src/build
+export LUMEN_WALLPAPER_DIR=${LUMEN_WALLPAPER_DIR:-$B/wallpapers}
 export HOME=/tmp/lumen-home
 export XDG_RUNTIME_DIR=/tmp/lumen-xdg
 export XDG_CONFIG_HOME=$HOME/.config XDG_DATA_HOME=$HOME/.local/share XDG_CACHE_HOME=$HOME/.cache
 mkdir -p "$XDG_RUNTIME_DIR" "$XDG_CONFIG_HOME/lumen" "$XDG_DATA_HOME" "$XDG_CACHE_HOME" && chmod 700 "$XDG_RUNTIME_DIR"
 for d in Desktop Documents Downloads Pictures Music Videos; do mkdir -p "$HOME/$d"; done
+# Sample content for QA screenshots (throwaway home under /tmp).
+if [ ! -f "$HOME/.seeded" ]; then
+    mkdir -p "$HOME/Documents/Projects/lumen-notes" "$HOME/Documents/Invoices"
+    printf '# Meeting notes\n\n- Ship LUMEN 1.0\n- Polish the Dock\n' > "$HOME/Documents/Meeting Notes.md"
+    printf 'Quarter,Revenue\nQ1,120\nQ2,135\nQ3,150\n' > "$HOME/Documents/Report Q3.csv"
+    printf 'Hello from LUMEN OS\n' > "$HOME/Documents/Projects/lumen-notes/README.txt"
+    printf '#!/bin/sh\necho hi\n' > "$HOME/Documents/Projects/build.sh"
+    touch "$HOME/Documents/Invoices/Invoice 2026-10.pdf" "$HOME/Downloads/lumen-os-1.0.iso.torrent"
+    for w in lumen-dawn aurora dunes peaks; do
+        [ -f "$LUMEN_WALLPAPER_DIR/$w.jpg" ] && cp "$LUMEN_WALLPAPER_DIR/$w.jpg" "$HOME/Pictures/$w.jpg"
+    done
+    touch "$HOME/.seeded"
+fi
 
 # Development data dir: desktop entries pointing into the build tree, icon
 # theme and wallpapers, ahead of the system dirs.
@@ -90,7 +104,7 @@ export XDG_CURRENT_DESKTOP=LUMEN:KDE XDG_SESSION_TYPE=wayland KDE_FULL_SESSION=t
 export QT_QPA_PLATFORMTHEME=kde
 export QT_FORCE_STDERR_LOGGING=1
 W=${SIZE%x*}; H=${SIZE#*x}
-LOG=$B/session-logs; mkdir -p "$LOG"
+LOG=$B/session-logs; mkdir -p "$LOG"; rm -f "$LOG"/*.log
 if [ "$COMPOSITOR" = sway ]; then
     # wlroots headless backend with the pixman renderer needs no GPU and
     # supports wlr-screencopy, so `grim` can capture the composited output.

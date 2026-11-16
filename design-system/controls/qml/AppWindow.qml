@@ -27,7 +27,7 @@ Window {
     property alias toolbarLeading: leadingRow.data
     property alias toolbarTrailing: trailingRow.data
     default property alias contentData: contentArea.data
-    readonly property alias contentItem: contentArea
+    readonly property alias contentArea: contentArea
     readonly property alias lumenBackdrop: blur
     readonly property bool maximized: visibility === Window.Maximized || visibility === Window.FullScreen
     readonly property real cornerRadius: maximized ? 0 : Theme.metrics.toolbarWindowRadius

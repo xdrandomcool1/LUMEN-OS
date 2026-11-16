@@ -2,6 +2,7 @@
 import QtQuick
 import Lumen.Design
 import Lumen.Shell
+import Lumen.System
 
 WidgetFrame {
     id: w

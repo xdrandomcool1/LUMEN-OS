@@ -7,6 +7,7 @@ import Lumen.Motion
 import Lumen.Glass
 import Lumen.Controls
 import Lumen.Shell
+import Lumen.System
 
 GlassSurface {
     id: panel

@@ -1,7 +1,9 @@
 # lumen-shell
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(LayerShellQt REQUIRED)
-foreach(_kf GlobalAccel KIO Service NetworkManagerQt PulseAudioQt)
+# LibTaskManager / LibNotificationManager do not find their own KF6
+# dependencies; satisfy their link interfaces explicitly.
+foreach(_kf GlobalAccel Config CoreAddons I18n WindowSystem Service ItemModels KIO)
     find_package(KF6${_kf} REQUIRED)
 endforeach()
 find_package(LibTaskManager REQUIRED)
@@ -22,29 +24,19 @@ qt_add_qml_module(lumen-shell
     VERSION 1.0
     SOURCES
         src/layersurface.h src/layersurface.cpp
-        src/appsmodel.h src/appsmodel.cpp
         src/shellcontroller.h src/shellcontroller.cpp
-        src/shellsettings.h src/shellsettings.cpp
-        src/wallpaperengine.h src/wallpaperengine.cpp
         src/regionwatcher.h src/regionwatcher.cpp
-        src/battery.h src/battery.cpp
-        src/keyboardlayout.h src/keyboardlayout.cpp
-        src/audio.h src/audio.cpp
-        src/network.h src/network.cpp
-        src/brightness.h src/brightness.cpp
         src/appmenu.h src/appmenu.cpp
-        src/filesearch.h src/filesearch.cpp
-        src/sysstats.h src/sysstats.cpp
     QML_FILES ${SHELL_QML}
-    IMPORTS Lumen.Design Lumen.Motion Lumen.Glass Lumen.Controls
+    IMPORTS Lumen.Design Lumen.Motion Lumen.Glass Lumen.Controls Lumen.System
 )
 target_include_directories(lumen-shell PRIVATE src)
 target_link_libraries(lumen-shell PRIVATE
     Qt6::Quick Qt6::Qml Qt6::DBus Qt6::Widgets Qt6::Concurrent
     LayerShellQt::Interface
-    KF6::GlobalAccel KF6::KIOGui KF6::KIOCore KF6::Service KF6::NetworkManagerQt KF6::PulseAudioQt
+    KF6::GlobalAccel
     PW::LibTaskManager PW::LibNotificationManager dbusmenu-lxqt
-    LumenDesign LumenGlass LumenControls LumenMotion)
+    LumenDesign LumenGlass LumenControls LumenMotion LumenSystem)
 
 install(TARGETS lumen-shell RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES data/lumen-shell.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)

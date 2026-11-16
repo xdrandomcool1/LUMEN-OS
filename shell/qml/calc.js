@@ -106,7 +106,8 @@ function evaluate(text) {
     if (!s.length) return null;
     // Require at least one operator or function so plain numbers/words
     // don't produce a "calculation" result.
-    if (!/[+\-*/%^×÷−(]/.test(s) && !/^(sqrt|sin|cos|tan|ln|log|exp|abs)/i.test(s)) return null;
+    if (!/[+\-*/%^×÷−(]/.test(s) && !/^(sqrt|sin|cos|tan|ln|log|exp|abs)/i.test(s)
+            && !/\d\s*(pi|π|e)$/i.test(s)) return null;
     var toks = tokenize(s);
     if (!toks || !toks.length) return null;
     try {

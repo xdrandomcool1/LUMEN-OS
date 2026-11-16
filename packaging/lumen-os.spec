@@ -76,7 +76,7 @@ Calamares settings, modules and branding used on the LUMEN OS live image.
 %autosetup -n %{name}-%{version}
 
 %build
-%cmake -DLUMEN_BUILD_TESTS=ON -DLUMEN_WALLPAPER_SIZE=3840x2160
+%cmake -DLUMEN_BUILD_TESTS=ON -DLUMEN_WALLPAPER_SIZE=3840x2160 -DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir}
 %cmake_build
 
 %check

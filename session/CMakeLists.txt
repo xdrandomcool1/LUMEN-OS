@@ -7,5 +7,4 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/themes/symbols/regular ${CMAKE_SOURCE_DIR}
         DESTINATION ${CMAKE_INSTALL_DATADIR}/lumen/symbols)
 install(FILES ${CMAKE_SOURCE_DIR}/themes/color-schemes/LumenLight.colors ${CMAKE_SOURCE_DIR}/themes/color-schemes/LumenDark.colors
         DESTINATION ${CMAKE_INSTALL_DATADIR}/color-schemes)
-install(FILES ${CMAKE_SOURCE_DIR}/wallpapers/collection.json DESTINATION ${CMAKE_INSTALL_DATADIR}/lumen/wallpapers)
 install(FILES ${CMAKE_SOURCE_DIR}/assets/logo/lumen-logo.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps)

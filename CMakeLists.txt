@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(LumenQml)
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS
-    Core Gui Qml Quick QuickControls2 ShaderTools DBus Svg Concurrent Network Test QuickTest)
+    Core Gui Qml Quick QuickControls2 QuickTemplates2 ShaderTools DBus Svg Concurrent Network Test QuickTest)
 qt_standard_project_setup(REQUIRES 6.8)
 qt_policy(SET QTP0004 NEW)
 

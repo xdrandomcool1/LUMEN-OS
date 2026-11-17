@@ -48,15 +48,26 @@ def defs_common(uid, top, bottom, angle=90):
       <stop offset="0" stop-color="{top}"/><stop offset="1" stop-color="{bottom}"/>
     </linearGradient>
     <linearGradient id="sheen{uid}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.38"/>
-      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="streak{uid}" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.30"/>
       <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="rim{uid}" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/>
-      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.08"/>
-      <stop offset="1" stop-color="#ffffff" stop-opacity="0.45"/>
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.50"/>
     </linearGradient>
+    <radialGradient id="halo{uid}" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.55" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="0.78" stop-color="#000000" stop-opacity="0.16"/>
+      <stop offset="0.9" stop-color="#000000" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
     <filter id="gs{uid}" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity="0.28"/>
     </filter>
@@ -80,13 +91,16 @@ def app_icon(uid, top, bottom, glyph, glyph_fill='#ffffff', scale=0.56, weight='
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
   <defs>{defs_common(uid, top, bottom, angle)}{gdef}</defs>
   <g>
+    <ellipse cx="512" cy="530" rx="500" ry="490" fill="url(#halo{uid})"/>
     <path d="{SQ}" fill="url(#bg{uid})"/>
     <g clip-path="url(#clip{uid})">
       {extra}
-      <ellipse cx="512" cy="230" rx="520" ry="300" fill="url(#sheen{uid})"/>
+      <ellipse cx="512" cy="230" rx="470" ry="260" fill="url(#sheen{uid})"/>
+      <rect x="600" y="-320" width="180" height="1700" fill="url(#streak{uid})" transform="rotate(26 512 512)"/>
+      <path d="{SQ}" fill="none" stroke="#000000" stroke-opacity="0.14" stroke-width="12" transform="translate(0,14)"/>
     </g>
     {glyph_svg}
-    <path d="{SQ}" fill="none" stroke="url(#rim{uid})" stroke-width="6"/>
+    <path d="{SQ}" fill="none" stroke="url(#rim{uid})" stroke-width="5"/>
   </g>
 </svg>
 '''
@@ -173,8 +187,15 @@ def trash_icon(full=False):
     <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#D5D7DE"/>
     </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.55" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="0.78" stop-color="#000000" stop-opacity="0.18"/>
+      <stop offset="0.9" stop-color="#000000" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
     <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#000" flood-opacity="0.3"/></filter>
   </defs>
+  <ellipse cx="512" cy="540" rx="470" ry="450" fill="url(#halo)"/>
   <g filter="url(#sh)">
     {paper}
     <path d="M300,360 L724,360 L680,880 Q676,912 640,912 L384,912 Q348,912 344,880 Z" fill="url(#body)" stroke="#ffffff" stroke-opacity="0.8" stroke-width="6"/>
@@ -203,8 +224,15 @@ def folder_icon(glyph):
   <defs>
     <linearGradient id="back" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5DB4F5"/><stop offset="1" stop-color="#3D97E6"/></linearGradient>
     <linearGradient id="front" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD0FF"/><stop offset="1" stop-color="#66B8F7"/></linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.55" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="0.78" stop-color="#000000" stop-opacity="0.16"/>
+      <stop offset="0.9" stop-color="#000000" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
     <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#0a3a70" flood-opacity="0.28"/></filter>
   </defs>
+  <ellipse cx="512" cy="530" rx="490" ry="470" fill="url(#halo)"/>
   <g filter="url(#sh)">
     <path d="M120,230 Q120,190 160,190 L400,190 Q430,190 450,215 L480,255 L864,255 Q904,255 904,295 L904,800 Q904,840 864,840 L160,840 Q120,840 120,800 Z" fill="url(#back)"/>
     <path d="M110,330 Q110,300 140,300 L884,300 Q914,300 914,330 L904,812 Q902,852 862,852 L162,852 Q122,852 120,812 Z" fill="url(#front)"/>
@@ -248,22 +276,22 @@ def main():
     os.makedirs(apps_dir, exist_ok=True)
     os.makedirs(places_dir, exist_ok=True)
     for i, (name, fn) in enumerate(sorted(APPS.items())):
-        with open(os.path.join(apps_dir, name + '.svg'), 'w') as f:
+        with open(os.path.join(apps_dir, name + '.svg'), 'w', newline='\n') as f:
             f.write(fn(str(i)))
     for name, glyph in FOLDER_GLYPHS.items():
-        with open(os.path.join(places_dir, name + '.svg'), 'w') as f:
+        with open(os.path.join(places_dir, name + '.svg'), 'w', newline='\n') as f:
             f.write(folder_icon(glyph))
     for name, full in (('user-trash', False), ('user-trash-full', True)):
-        with open(os.path.join(places_dir, name + '.svg'), 'w') as f:
+        with open(os.path.join(places_dir, name + '.svg'), 'w', newline='\n') as f:
             f.write(trash_icon(full))
-    with open(os.path.join(OUT, 'index.theme'), 'w') as f:
+    with open(os.path.join(OUT, 'index.theme'), 'w', newline='\n') as f:
         f.write('''[Icon Theme]
 Name=Lumen
 Comment=LUMEN OS icon theme
-Inherits=breeze,hicolor
+Inherits=breeze,hicolor,adwaita
 Example=lumen-finder
 DisplayDepth=32
-Directories=scalable/apps,scalable/places
+Directories=scalable/apps,scalable/places,128x128/apps,128x128/places,256x256/apps,256x256/places
 
 [scalable/apps]
 Size=128
@@ -278,6 +306,26 @@ MinSize=16
 MaxSize=1024
 Context=Places
 Type=Scalable
+
+[128x128/apps]
+Size=128
+Context=Applications
+Type=Threshold
+
+[128x128/places]
+Size=128
+Context=Places
+Type=Threshold
+
+[256x256/apps]
+Size=256
+Context=Applications
+Type=Threshold
+
+[256x256/places]
+Size=256
+Context=Places
+Type=Threshold
 ''')
     print('icons written to', OUT)
 

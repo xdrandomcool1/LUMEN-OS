@@ -4,7 +4,7 @@ Comment=LUMEN OS icon theme
 Inherits=breeze,hicolor,adwaita
 Example=lumen-finder
 DisplayDepth=32
-Directories=scalable/apps,scalable/places
+Directories=scalable/apps,scalable/places,128x128/apps,128x128/places,256x256/apps,256x256/places
 
 [scalable/apps]
 Size=128
@@ -19,3 +19,23 @@ MinSize=16
 MaxSize=1024
 Context=Places
 Type=Scalable
+
+[128x128/apps]
+Size=128
+Context=Applications
+Type=Threshold
+
+[128x128/places]
+Size=128
+Context=Places
+Type=Threshold
+
+[256x256/apps]
+Size=256
+Context=Applications
+Type=Threshold
+
+[256x256/places]
+Size=256
+Context=Places
+Type=Threshold

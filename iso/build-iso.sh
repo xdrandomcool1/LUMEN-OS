@@ -9,6 +9,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RUNTIME="${CONTAINER_RUNTIME:-$(command -v podman || command -v docker)}"
 [ -f "$ROOT/out/repo/repodata/repomd.xml" ] || { echo "run scripts/build-rpms.sh first"; exit 1; }
 mkdir -p "$ROOT/out/iso"; rm -rf "$ROOT/out/kiwi"; mkdir -p "$ROOT/out/kiwi"
+# The kiwi workspace peaks at ~15 GB; never leave it behind, even on failure.
+trap 'rm -rf "$ROOT/out/kiwi"' EXIT
 "$RUNTIME" run --rm --privileged \
     -v "$ROOT":/src -v "$ROOT/out/repo":/repo:ro -v "$ROOT/out/kiwi":/work -v "$ROOT/scripts/devcontainer/extra-ca":/extra-ca:ro \
     -w /src registry.fedoraproject.org/fedora:45 bash -euxc '

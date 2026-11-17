@@ -43,3 +43,35 @@ run or screenshot produced in the dev container (`scripts/devcontainer`).
   the sway QA session (they need KWin's privileged protocols, and KWin can't
   use OpenGL without a GPU here). They are covered by code paths tested in
   the KWin integration run (shell starts, registers D-Bus, loads all panels).
+
+## Milestones 2–5 — progress (2026-11-16/17)
+
+* ☑ Control Center, Spotlight (apps, files via lumend, settings, actions,
+  calculator), Notification Center + banners, widgets — captured on a live
+  compositor (`docs/screenshots/m1-*`, `m2-spotlight.png`).
+* ☑ Applications: Finder, Settings, Terminal, Activity Monitor, App Store,
+  Calculator, Calendar, Text Editor, Image Viewer, Media Player, Screenshot
+  (`docs/screenshots/m3-*`). Smoke-tested together in one session, no QML
+  errors except the optional syntax-highlighting module where absent.
+* ☑ KWin: `org.lumen.decoration` verified loaded by KWin 6.8.3 via
+  `supportInformation`; `/etc/xdg` defaults verified applied; gestures plugin
+  and scripted effect install. Effects cannot run without OpenGL compositing
+  in this sandbox ("Compositing is not active").
+* ☑ lumend: unit tests + D-Bus activation in a live session.
+* ☑ Test suite (`ctest`): lumend-unit, core-unit, js-engines, apps-unit — 100 %
+  passing, also inside `rpmbuild %check`.
+* ☑ SDDM greeter theme rendered by `sddm-greeter-qt6 --test-mode`
+  (`docs/screenshots/m4-login.png`); Plymouth script theme + assets.
+* ☑ RPMs: lumen-desktop, lumen-apps, lumen-installer (`scripts/build-rpms.sh`).
+* ☑ ISO: `iso/build-iso.sh` (kiwi-ng, Fedora 45 + updates + local repo):
+  `LUMEN-OS.x86_64-1.0.0.iso`, 1.3 GB, hybrid BIOS/UEFI El Torito, shim +
+  GRUB, dmsquash live root. SHA256 in `out/iso/SHA256SUMS`.
+
+### More problems solved
+| Problem | Resolution |
+|---|---|
+| kiwi passed metalink URLs as baseurl | `sourcetype="metalink"` |
+| dnf inside the image root rejected the build proxy's TLS certificate (metadata resolves CA paths on the host, packages inside the root) | kiwi `customize` hook + identical CA path on host and in root, deleted by `config.sh` before sealing |
+| Fedora 45 moved GPG keys / dropped `PLATFORM_ID` | `/usr/share/pki/rpm-gpg/RPM-GPG-KEY-fedora-45-primary`; default value |
+| QML enums of C++-rooted controls are `undefined` inside JS expressions | documented in DESIGN_SYSTEM.md §6; avoided in code |
+| `.flat()`/inline component scoping/`Window.window` on popups | fixed per component |

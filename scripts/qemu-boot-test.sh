@@ -17,10 +17,10 @@ KVM=""; [ -e /dev/kvm ] && KVM="--device /dev/kvm"
     dnf -y -q install qemu-system-x86-core edk2-ovmf python3 >/dev/null
     cp /usr/share/edk2/ovmf/OVMF_VARS.fd /tmp/vars.fd
     ACCEL="tcg,thread=multi"; CPU="max"; [ -e /dev/kvm ] && { ACCEL=kvm; CPU=host; }
-    qemu-system-x86_64 -machine q35,accel=$ACCEL -cpu $CPU -smp 4 -m 6144 \
+    qemu-system-x86_64 -machine q35 -accel $ACCEL -cpu $CPU -smp 4 -m 6144 \
         -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE.fd \
         -drive if=pflash,format=raw,file=/tmp/vars.fd \
-        -cdrom "$ISO" -boot d -vga virtio -display none \
+        -cdrom "$ISO" -boot d -vga std -display none \
         -qmp unix:/tmp/qmp.sock,server,nowait -serial file:/src/out/boot/serial.log &
     QEMU=$!
     sleep 3
@@ -30,6 +30,9 @@ def qmp(cmd, **args):
     s = socket.socket(socket.AF_UNIX); s.connect("/tmp/qmp.sock"); f = s.makefile("rw")
     f.readline(); f.write(json.dumps({"execute": "qmp_capabilities"}) + "\n"); f.flush(); f.readline()
     f.write(json.dumps({"execute": cmd, "arguments": args}) + "\n"); f.flush(); r = f.readline(); s.close(); return r
+for _ in range(60):
+    if os.path.exists("/tmp/qmp.sock"): break
+    time.sleep(1)
 end = time.time() + int(os.environ["MINUTES"]) * 60; n = 0
 while time.time() < end:
     qmp("screendump", filename=f"/src/out/boot/frame-{n:03d}.ppm"); print("frame", n, flush=True)

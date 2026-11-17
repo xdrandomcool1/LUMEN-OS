@@ -18,7 +18,7 @@
         <type image="iso" primary="true" flags="dmsquash" firmware="uefi"
               volid="LUMEN-OS-1_0" publisher="LUMEN OS" mediacheck="false"
               kernelcmdline="rhgb quiet rd.live.image">
-            <bootloader name="grub2" console="gfxterm" timeout="5"/>
+            <bootloader name="grub2" console="console" timeout="5"/>
         </type>
     </preferences>
     <users>
@@ -39,7 +39,9 @@
     <repository type="rpm-md" alias="lumen" priority="1" package_gpgcheck="false">
         <source path="dir:///repo"/>
     </repository>
-    <packages type="image">
+    <!-- plusRecommended: install weak dependencies like Fedora spins do
+         (e.g. systemd-pam, which provides pam_systemd for logind sessions). -->
+    <packages type="image" patternType="plusRecommended">
         <!-- Base system, kernel, firmware, boot -->
         <package name="kernel"/>
         <package name="kernel-modules-extra"/>
@@ -52,6 +54,9 @@
         <package name="shim-x64"/>
         <package name="efibootmgr"/>
         <package name="systemd"/>
+        <package name="systemd-pam"/>
+        <package name="polkit"/>
+        <package name="xdg-user-dirs"/>
         <package name="sudo"/>
         <package name="bash-completion"/>
         <package name="vim-minimal"/>

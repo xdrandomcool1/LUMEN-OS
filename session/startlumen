@@ -14,4 +14,9 @@ export QT_QPA_PLATFORMTHEME=kde
 export QT_QUICK_CONTROLS_STYLE=org.kde.desktop
 # Smooth GPU scheduling hints for NVIDIA (no effect on other vendors).
 export __GL_MaxFramesAllowed=1
+# startplasma-wayland resets XDG_CURRENT_DESKTOP to "KDE", so hand an explicit
+# marker to the systemd user manager (unit ExecConditions) and to D-Bus
+# activation before it starts the session units.
+systemctl --user set-environment LUMEN_SESSION=1 DESKTOP_SESSION=lumen
+dbus-update-activation-environment --systemd LUMEN_SESSION=1 DESKTOP_SESSION=lumen 2>/dev/null || true
 exec /usr/bin/startplasma-wayland "$@"

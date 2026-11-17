@@ -29,4 +29,8 @@ NetworkManager, BlueZ, UPower, PowerDevil, firewalld and Flatpak.
 * Mission Control uses KWin's Overview effect, with LUMEN gestures and
   shortcuts.
 * Proprietary NVIDIA drivers and non-free codecs aren't included (licensing);
-  they install from RPM Fusion.
+  the driver installs from RPM Fusion in one click (Control Center ›
+  Graphics › Install NVIDIA Driver).
+* On machines without GPU acceleration (VMs without 3D, unknown drivers)
+  LUMEN automatically drops to a software tier: plain translucent panels
+  replace Liquid Glass so the session stays responsive.

@@ -143,3 +143,52 @@ captures (`run-session.sh --wallpaper lumen-dusk|peaks`).
 
 Known issue: the pinned Firefox launcher shows a generic icon in the Dock
 although `firefox.png` is present in hicolor (not yet investigated).
+
+## Performance tiers and hardware acceleration (2026-11-17)
+
+The whole desktop had only ever run on llvmpipe: KWin's `isOpenGLCompositing()`
+is true there (real GL API, CPU-rasterised), so the `lumen_glass` effect loaded
+and captured the backdrop at device resolution, and every shell window built a
+Kawase pyramid — all on the CPU. That is what made the desktop lag in VMs, and
+RTX-class hardware with only nouveau hits the same wall (see
+HARDWARE_TEST_PLAN.md).
+
+* **Renderer tiers** — `Lumen.Design` gained the `Gpu` singleton
+  (`design-system/src/gpu.*`): one offscreen `QOpenGLContext` probe of
+  `GL_RENDERER` per process classifies Full (real GPU) / Lite
+  (virtio/virgl/venus/SVGA) / Software (llvmpipe, softpipe, swrast,
+  SwiftShader). `LUMEN_PERF=full|lite|software|auto` overrides the probe.
+* **KWin gate** — `lumen_glass::supported()` now returns false for software
+  rasterisers (same check as KWin's own blur: `effects->openglContext()` →
+  `isSoftwareRenderer()`), with a `LUMEN_FORCE_GLASS=1` escape hatch. The
+  shell then runs its tint fallback.
+* **Software-tier shell** — on the software tier `GlassSurface` skips the
+  refraction `ShaderEffect` entirely and draws a plain translucent panel (the
+  macOS reduce-transparency look), `BackdropBlur` gained an `active` switch,
+  and Dock/PanelHost/Desktop stop requesting `blurBehind` and stop publishing
+  compositor shapes. On real GPUs everything renders exactly as before.
+* **NVIDIA one-click setup** — `lumen-nvidia-setup` (libexec, pkexec) adds
+  RPM Fusion free/nonfree, installs `kernel-devel` for the running kernel and
+  `akmod-nvidia`, builds the module (`akmods`) and warns when Secure Boot
+  would block it. `SystemActions` (Lumen.System) drives it and reports
+  progress; Control Center shows a Graphics module when NVIDIA hardware runs
+  on the software tier, Spotlight gains the matching action, Settings › About
+  appends the GL renderer string.
+* **ISO** — `intel-media-driver`, `libva-utils`, `mokutil`, `spice-vdagent`,
+  `qemu-guest-agent` added; CI gained an optional `boot_test` dispatch input
+  that boots the fresh ISO in QEMU (KVM on the runner) and fails if the live
+  session never starts; the guest diag now records the Firefox desktop id,
+  the setup helper and VA-API state.
+* **Firefox Dock icon (known issue resolved)** — the skel pinned
+  `applications:firefox.desktop`, but the RPM has shipped
+  `org.mozilla.firefox.desktop` since Fedora 40; the unknown launcher id is
+  what rendered as a generic icon. The skel now pins the right id and
+  `config.sh` resolves whatever id the image actually ships; the Lumen icon
+  theme also falls back to adwaita.
+
+| Problem | Resolution |
+|---|---|
+| llvmpipe ran the full glass pipeline | tier gate in the effect + plain-surface path in the shell |
+| Glass could still sample an inactive pyramid | `BackdropBlur.active` drops the pyramid and the full-res capture |
+| pkexec needs an in-session polkit agent | polkit-kde is already a `lumen-desktop` Require (Plasma session agent) |
+| Unknown pinned launcher rendered generic | skel id fix + build-time id resolution (above) |

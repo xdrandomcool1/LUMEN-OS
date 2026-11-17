@@ -30,6 +30,21 @@ repository's **Releases**. Write the ISO to a USB stick (Fedora Media Writer,
 balenaEtcher or `dd`) and boot it on a UEFI PC — or in a VM with UEFI firmware
 — then start the installer (Calamares) from the first icon in the Dock.
 
+## Hardware & VM notes
+
+* **Intel / AMD** get full GPU acceleration out of the box (Mesa; VA-API video
+  decode included).
+* **NVIDIA**: the ISO boots with nouveau; with an RTX/GTX card Control Center
+  › Graphics offers **Install NVIDIA Driver** — one click (pkexec) adds RPM
+  Fusion and installs `akmod-nvidia`, then a reboot activates it. Secure Boot
+  must be off (or a MOK key enrolled); the helper detects and warns.
+* **VMs**: use QEMU/KVM with UEFI (`scripts/qemu-boot-test.sh` boots the ISO
+  the same way). VirtualBox has no usable Linux GPU acceleration for Wayland.
+* Without GPU acceleration LUMEN switches to a **software tier**: plain
+  translucent panels replace Liquid Glass so the session stays responsive.
+  The tier is shown in Settings › About; `LUMEN_PERF=full|lite|software`
+  overrides the probe.
+
 ## Building
 
 Everything builds inside a Fedora 45 container that matches the target:

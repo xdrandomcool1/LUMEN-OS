@@ -5,12 +5,37 @@ LUMEN OS was developed and tested in a cloud container with no GPU, no
 hardware, so it hasn't been run yet. Each item lists the expected behaviour
 and how to check it.
 
+## Performance tiers (automatic)
+
+Behaviour no longer depends on the test machine having a GPU:
+
+| Renderer | Tier | What runs |
+|---|---|---|
+| NVIDIA (proprietary) / AMD / Intel, real GPU | Full | full Liquid Glass: `lumen_glass` + in-scene backdrops |
+| virtio / virgl / venus / SVGA3D | Lite | same as Full, flagged as paravirtualised |
+| llvmpipe / softpipe / swrast / SwiftShader | Software | `lumen_glass` does not load (KWin's own blur does the same); `GlassSurface` draws plain translucent panels; no `blurBehind` requests |
+
+The tier is shown in Settings › About and Control Center › Graphics;
+`LUMEN_PERF=full|lite|software` overrides the probe. On the software tier the
+session stays responsive with reduced visuals — that is the expected look in
+a VM without 3D acceleration, not a bug.
+
+## NVIDIA (RTX / GTX, proprietary driver)
+
+The ISO ships nouveau only. With NVIDIA hardware on the software tier,
+Control Center › Graphics offers **Install NVIDIA Driver** (one click via
+pkexec): it adds RPM Fusion free/nonfree, installs `kernel-devel` for the
+running kernel plus `akmod-nvidia`, builds the module (`akmods`) and asks for
+a reboot. Terminal equivalent: `pkexec /usr/libexec/lumen-nvidia-setup`.
+Secure Boot must be disabled (or a MOK key enrolled) for the module to load;
+the helper detects this and warns in the journal.
+
 | # | Area | Test | Expected | Status |
 |---|---|---|---|---|
 | 1 | UEFI boot | Boot ISO with Secure Boot on (shim) | GRUB menu → Plymouth LUMEN splash → live session | ☐ |
 | 2 | Intel graphics | Live session on Intel Xe/Arc | KWin OpenGL compositing; blur & window effects active (`qdbus org.kde.KWin /KWin supportInformation`) | ☐ |
 | 3 | AMD graphics | RDNA2/3 | As above; Activity Monitor GPU tab reports `gpu_busy_percent` | ☐ |
-| 4 | NVIDIA RTX | Install RPM Fusion `akmod-nvidia`, `nvidia-drm.modeset=1` (default in recent drivers) | Wayland session with explicit sync; GPU tab via `nvidia-smi` | ☐ |
+| 4 | NVIDIA RTX | Control Center › Graphics → Install NVIDIA Driver (or `pkexec /usr/libexec/lumen-nvidia-setup`), reboot | Proprietary driver loads (`nvidia-smi`), KWin reports full tier, effects active | ☐ |
 | 5 | NVIDIA (nouveau) | Out of the box | Session starts; software fallbacks acceptable | ☐ |
 | 6 | HiDPI | 2× panel | Shell, Dock, glass and apps crisp; scale set in Settings › Displays | ☐ |
 | 7 | High refresh | 120/144/240 Hz panel | Dock magnification and springs advance per frame (no 60 Hz cap) | ☐ |

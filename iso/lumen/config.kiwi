@@ -13,7 +13,7 @@
         <keytable>us</keytable>
         <timezone>UTC</timezone>
         <rpm-excludedocs>true</rpm-excludedocs>
-        <rpm-check-signatures>false</rpm-check-signatures>
+        <rpm-check-signatures>true</rpm-check-signatures>
         <bootsplash-theme>lumen</bootsplash-theme>
         <type image="iso" primary="true" flags="dmsquash" firmware="uefi"
               volid="LUMEN-OS-1_0" publisher="LUMEN OS" mediacheck="false"
@@ -24,13 +24,19 @@
     <users>
         <user password="" pwdformat="plain" name="liveuser" home="/home/liveuser" groups="wheel" realname="LUMEN Live"/>
     </users>
-    <repository type="rpm-md" alias="fedora" priority="10">
-        <source path="https://mirrors.fedoraproject.org/metalink?repo=fedora-45&amp;arch=x86_64"/>
+    <!-- Fedora packages are verified with Fedora's GPG keys (rpm-check-signatures). -->
+    <repository type="rpm-md" alias="fedora" priority="10" sourcetype="metalink" package_gpgcheck="true" customize="/src/iso/lumen/repo-customize.sh">
+        <source path="https://mirrors.fedoraproject.org/metalink?repo=fedora-45&amp;arch=x86_64">
+            <signing key="file:///usr/share/pki/rpm-gpg/RPM-GPG-KEY-fedora-45-primary"/>
+        </source>
     </repository>
-    <repository type="rpm-md" alias="updates" priority="5">
-        <source path="https://mirrors.fedoraproject.org/metalink?repo=updates-released-f45&amp;arch=x86_64"/>
+    <repository type="rpm-md" alias="updates" priority="5" sourcetype="metalink" package_gpgcheck="true" customize="/src/iso/lumen/repo-customize.sh">
+        <source path="https://mirrors.fedoraproject.org/metalink?repo=updates-released-f45&amp;arch=x86_64">
+            <signing key="file:///usr/share/pki/rpm-gpg/RPM-GPG-KEY-fedora-45-primary"/>
+        </source>
     </repository>
-    <repository type="rpm-md" alias="lumen" priority="1">
+    <!-- Locally built LUMEN packages (scripts/build-rpms.sh). -->
+    <repository type="rpm-md" alias="lumen" priority="1" package_gpgcheck="false">
         <source path="dir:///repo"/>
     </repository>
     <packages type="image">

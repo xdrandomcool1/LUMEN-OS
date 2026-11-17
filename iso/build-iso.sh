@@ -14,8 +14,13 @@ mkdir -p "$ROOT/out/iso"
     -w /src registry.fedoraproject.org/fedora:45 bash -euxc '
         cp /extra-ca/*.crt /etc/pki/ca-trust/source/anchors/ 2>/dev/null || true; update-ca-trust
         dnf -y -q install kiwi-cli kiwi-systemdeps-iso-media kiwi-systemdeps-bootloaders kiwi-systemdeps-filesystems
-        rm -rf /tmp/kiwi-out
-        kiwi-ng --type iso system build --description /src/iso/lumen --target-dir /tmp/kiwi-out
+        rm -rf /tmp/kiwi-root /tmp/kiwi-out
+        mkdir -p /tmp/kiwi-root/var/tmp
+        # Build-environment trust anchors (TLS-intercepting proxies only);
+        # removed again by config.sh before the image is sealed.
+        if ls /extra-ca/*.crt >/dev/null 2>&1; then cp /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /tmp/kiwi-root/var/tmp/lumen-build-ca.crt; cp /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /var/tmp/lumen-build-ca.crt; fi
+        kiwi-ng --type iso system prepare --description /src/iso/lumen --root /tmp/kiwi-root --allow-existing-root
+        kiwi-ng --type iso system create --root /tmp/kiwi-root --target-dir /tmp/kiwi-out
         cp /tmp/kiwi-out/*.iso /src/out/iso/
         cd /src/out/iso && sha256sum *.iso > SHA256SUMS'
 ls -la "$ROOT/out/iso"

@@ -16,7 +16,7 @@ LOGO=lumen-logo
 HOME_URL="https://github.com/xdrandomcool1/LUMEN-OS"
 LUMEN_VERSION=1.0.0
 FEDORA_VERSION_ID=${VERSION_ID}
-PLATFORM_ID="${PLATFORM_ID}"
+PLATFORM_ID="${PLATFORM_ID:-platform:f${VERSION_ID}}"
 CPE_NAME="cpe:/o:lumen:lumen_os:1.0"
 OS
 echo "LUMEN OS 1.0 \\n \\l" > /etc/issue
@@ -39,10 +39,13 @@ mkdir -p /home/liveuser/.config/lumen
 cp /etc/skel/.config/lumen/lumenrc /home/liveuser/.config/lumen/lumenrc
 # Pin the installer in the live session's Dock.
 sed -i 's|^pinned=|pinned=applications:calamares.desktop,|' /home/liveuser/.config/lumen/lumenrc
-chown -R liveuser:liveuser /home/liveuser
+chown -R liveuser: /home/liveuser
 
 # --- Apps -------------------------------------------------------------------------
 flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || true
+
+# Remove the build-environment CA seeded by build-iso.sh (never shipped).
+rm -f /var/tmp/lumen-build-ca.crt
 
 # Keep the image lean.
 rm -rf /var/cache/dnf/* /usr/share/doc/* || true

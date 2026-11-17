@@ -29,6 +29,8 @@ Window {
     //! Rect (window coordinates) of the panel currently shown.
     property rect activeRect: Qt.rect(0, 0, 0, 0)
     property real activeRadius: 20
+    //! Material of the panel currently shown (for compositor glass).
+    property int activeMaterial: Glass.Regular
 
     LayerSurface {
         id: layer
@@ -51,13 +53,30 @@ Window {
         model: ShellState.windows
         region: win.activeRect
     }
-    readonly property BackdropBlur glassBackdrop: occlusion.occupied ? null : blur
-    readonly property bool glassCompositor: occlusion.occupied
+    readonly property BackdropBlur glassBackdrop: occlusion.occupied || kwinGlass.active ? null : blur
+    readonly property bool glassCompositor: occlusion.occupied || kwinGlass.active
+
+    // Compositor-side Liquid Glass behind the open panel (see Dock.qml).
+    readonly property bool lumenCompositorGlass: kwinGlass.active
+    readonly property var activeParams: Glass.material(win.activeMaterial, Appearance.dark, Appearance.accent)
+    CompositorGlass {
+        id: kwinGlass
+        scope: "lumen-panels"
+        output: win.targetScreen ? win.targetScreen.name : ""
+        enabled: win.open && win.activeRect.width > 0
+        shapes: [{
+            x: win.activeRect.x, y: win.activeRect.y, w: win.activeRect.width, h: win.activeRect.height,
+            r: win.activeRadius, n: 2.6,
+            thick: win.activeParams.refraction * Appearance.glassIntensity, lens: win.activeParams.lensWidth,
+            disp: win.activeParams.dispersion, ior: win.activeParams.ior, frost: win.activeParams.frost,
+            sat: win.activeParams.saturation, bri: win.activeParams.brightness
+        }]
+    }
 
     WindowEffects {
         window: win
         shadow: false
-        blurBehind: win.open && occlusion.occupied && win.activeRect.width > 0
+        blurBehind: !kwinGlass.active && win.open && occlusion.occupied && win.activeRect.width > 0
         blurRect: win.activeRect
         radius: win.activeRadius
     }
@@ -100,7 +119,7 @@ Window {
                 onItemsChanged: currentIndex = -1
                 MouseArea { anchors.fill: parent; z: -1; onPressed: mouse => mouse.accepted = true }
             }
-            onShownChanged: if (shown) { win.activeRect = Qt.rect(menu.x, menu.y, menu.width, menu.height); win.activeRadius = menu.radius }
+            onShownChanged: if (shown) { win.activeRect = Qt.rect(menu.x, menu.y, menu.width, menu.height); win.activeRadius = menu.radius; win.activeMaterial = Glass.Thin }
             Keys.forwardTo: []
         }
 
@@ -117,7 +136,7 @@ Window {
             y: Theme.metrics.menuBarHeight + 6
             backdrop: win.glassBackdrop
             compositorBlur: win.glassCompositor
-            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, height); win.activeRadius = Theme.metrics.panelRadius }
+            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, height); win.activeRadius = Theme.metrics.panelRadius; win.activeMaterial = Glass.Regular }
             onHeightChanged: if (shown) win.activeRect = Qt.rect(x, y, width, height)
         }
 
@@ -130,7 +149,7 @@ Window {
             y: Math.round(win.height * 0.22)
             backdrop: win.glassBackdrop
             compositorBlur: win.glassCompositor
-            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, 400); win.activeRadius = 27 }
+            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, 400); win.activeRadius = 27; win.activeMaterial = Glass.Frosted }
         }
 
         // ---- Notification Center --------------------------------------
@@ -142,7 +161,7 @@ Window {
             height: win.height - y - 10
             backdrop: win.glassBackdrop
             compositorBlur: win.glassCompositor
-            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, height); win.activeRadius = 22 }
+            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, height); win.activeRadius = 22; win.activeMaterial = Glass.Regular }
         }
     }
 }

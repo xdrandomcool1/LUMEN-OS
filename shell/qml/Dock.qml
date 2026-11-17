@@ -105,10 +105,22 @@ Window {
                         (win.targetScreen ? win.targetScreen.virtualY + win.targetScreen.height - win.height : 0) + win.dockRect.y,
                         win.dockRect.width, win.dockRect.height)
     }
+    // Compositor-side Liquid Glass (KWin effect lumen_glass): refracts the
+    // real content behind the Dock, windows included. Without it, fall back
+    // to refracting the wallpaper in-process and to compositor blur when a
+    // window is underneath.
+    readonly property bool lumenCompositorGlass: kwinGlass.active
+    CompositorGlass {
+        id: kwinGlass
+        scope: "lumen-dock"
+        output: win.targetScreen ? win.targetScreen.name : ""
+        enabled: hidden.value < 0.95
+        shapes: [ dockGlass.compositorShape(Qt.rect(win.dockRect.x, win.dockRect.y, win.dockRect.width, win.glassH)) ]
+    }
     WindowEffects {
         window: win
         shadow: false
-        blurBehind: occlusion.occupied && hidden.value < 0.95
+        blurBehind: !kwinGlass.active && occlusion.occupied && hidden.value < 0.95
         blurRect: win.dockRect
         radius: dockGlass.radius
     }
@@ -124,8 +136,8 @@ Window {
         height: win.glassH
         radius: Math.round(height * 0.42)
         material: Glass.UltraThin
-        backdrop: occlusion.occupied ? null : blur
-        compositorBlur: occlusion.occupied
+        backdrop: occlusion.occupied || kwinGlass.active ? null : blur
+        compositorBlur: occlusion.occupied || kwinGlass.active
         shadowScale: 1.0
         shadowOffsetY: 8
     }

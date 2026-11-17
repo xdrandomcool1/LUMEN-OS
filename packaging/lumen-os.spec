@@ -96,6 +96,7 @@ export QT_QPA_PLATFORM=offscreen
 %{_libdir}/qt6/qml/Lumen/
 %{_libdir}/qt6/plugins/org.kde.kdecoration3/org.lumen.decoration.so
 %{_libdir}/qt6/plugins/kwin/effects/plugins/lumen_gestures.so
+%{_libdir}/qt6/plugins/kwin/effects/plugins/lumen_glass.so
 %{_datadir}/kwin/effects/lumen_windows/
 %{_datadir}/kwin/tabbox/lumen-switcher/
 %{_datadir}/applications/lumen-shell.desktop

@@ -12,6 +12,7 @@ blurEnabled=true
 contrastEnabled=true
 lumen_windowsEnabled=true
 lumen_gesturesEnabled=true
+lumen_glassEnabled=true
 overviewEnabled=true
 windowviewEnabled=true
 slideEnabled=true

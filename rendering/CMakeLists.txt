@@ -8,6 +8,7 @@ qt_add_qml_module(LumenGlass
         src/materials.h
         src/glass.h src/glass.cpp
         src/backdroptracker.h src/backdroptracker.cpp
+        src/compositorglass.h src/compositorglass.cpp
     QML_FILES
         qml/BackdropBlur.qml
         qml/GlassSurface.qml
@@ -23,6 +24,6 @@ qt_add_shaders(LumenGlass "lumen_glass_shaders"
         ${CMAKE_SOURCE_DIR}/shaders/glass.frag
 )
 target_include_directories(LumenGlass PUBLIC src)
-target_link_libraries(LumenGlass PUBLIC Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick LumenDesign)
+target_link_libraries(LumenGlass PUBLIC Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick LumenDesign PRIVATE Qt6::DBus)
 set_target_properties(LumenGlass PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
 lumen_install_qml_module(LumenGlass LumenGlassPlugin Lumen/Glass)

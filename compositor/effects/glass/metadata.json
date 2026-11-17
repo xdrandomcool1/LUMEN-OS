@@ -1,0 +1,9 @@
+{
+    "KPlugin": {
+        "Name": "LUMEN Liquid Glass",
+        "Description": "Refracts the content behind LUMEN shell surfaces (Dock, Control Center, menus) like Liquid Glass.",
+        "Category": "Appearance",
+        "EnabledByDefault": true,
+        "License": "GPL-3.0-or-later"
+    }
+}

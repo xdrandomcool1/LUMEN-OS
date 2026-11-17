@@ -13,6 +13,7 @@
 // surface renders tint + light only and expects the compositor to blur
 // behind it (see GlassWindow helpers in lumen-shell).
 import QtQuick
+import QtQuick.Window
 import Lumen.Design
 import Lumen.Glass
 
@@ -41,7 +42,24 @@ Item {
     //! Without an in-scene backdrop: true when the compositor blurs behind
     //! this surface (translucent tint), false for an opaque-ish material.
     property bool compositorBlur: false
+    //! True when the window publishes this glass to KWin's lumen_glass
+    //! effect (window property lumenCompositorGlass): the compositor draws
+    //! the refracted backdrop and this surface adds tint and light only.
+    readonly property bool compositorGlass: compositorBlur && Window.window !== null
+                                            && Window.window.lumenCompositorGlass === true
     property vector2d lightDirection: Qt.vector2d(0.38, 0.92).normalized()
+
+    //! Shape description for CompositorGlass (window coordinates \a r).
+    function compositorShape(r) {
+        return {
+            x: r.x, y: r.y, w: r.width, h: r.height,
+            r: root.radius, n: root.smoothness,
+            thick: root.params.refraction * root.refractionScale * Appearance.glassIntensity,
+            lens: root.params.lensWidth, disp: root.params.dispersion, ior: root.params.ior,
+            frost: Math.max(0, Math.min(1, root.params.frost + root.frostBias)),
+            sat: root.params.saturation, bri: root.params.brightness
+        }
+    }
 
     default property alias contentData: content.data
     readonly property alias contentItem: content
@@ -88,7 +106,7 @@ Item {
         property real smoothness: root.smoothness
         property rect backdropRect: tracker.normalizedRect
         property real hasBackdrop: inScene ? 1 : 0
-        property real compositorBlur: root.compositorBlur ? 1 : 0
+        property real compositorBlur: root.compositorGlass ? 2 : (root.compositorBlur ? 1 : 0)
         property real refraction: root.params.refraction * root.refractionScale * Appearance.glassIntensity
         property real lensWidth: root.params.lensWidth
         property real dispersion: root.params.dispersion

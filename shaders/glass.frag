@@ -35,7 +35,7 @@ layout(std140, binding = 0) uniform buf {
     float smoothness;    // corner exponent: 2 = circular, ~2.6 = continuous
     vec4 backdropRect;   // item rect in backdrop UV space (u, v, du, dv)
     float hasBackdrop;   // 1: in-scene backdrop, 0: none
-    float compositorBlur; // 1: compositor blurs behind (no in-scene backdrop)
+    float compositorBlur; // 1: compositor blurs behind, 2: compositor refracts (lumen_glass)
     float refraction;    // max rim displacement (px)
     float lensWidth;     // width of the refracting bevel (px)
     float dispersion;    // chromatic dispersion (0..1)
@@ -191,6 +191,13 @@ void main()
             float adapt = adaptivity * smoothstep(0.12, 0.65, abs(L - tl));
             col = mix(c, tint.rgb, clamp(tint.a + adapt * (1.0 - tint.a) * 0.5, 0.0, 1.0));
             alpha = 1.0;
+        } else if (compositorBlur > 1.5) {
+            // Compositor glass: KWin's lumen_glass effect has already drawn
+            // the refracted backdrop under us; contribute tint and light
+            // only. The backdrop is unknown here, so adaptivity becomes a
+            // small constant veil that keeps content legible.
+            col = tint.rgb;
+            alpha = clamp(tint.a + 0.25 * adaptivity, 0.0, 1.0);
         } else {
             // Compositor-blur mode: the backdrop is blurred behind us by
             // the compositor; we only contribute tint and light.
@@ -209,8 +216,17 @@ void main()
         // so it stays clear.
         float fres = 0.04 + 0.96 * pow(1.0 - clamp(fresnelCos, 0.0, 1.0), 5.0);
         vec3 env = dark > 0.5 ? vec3(0.78, 0.80, 0.86) : vec3(1.0);
-        float envAmt = fres * specular * (0.45 + 0.35 * max(lit, 0.0));
-        col = mix(col, env, clamp(envAmt, 0.0, 0.85));
+        float envAmt = clamp(fres * specular * (0.45 + 0.35 * max(lit, 0.0)), 0.0, 0.85);
+        if (hasBackdrop > 0.5) {
+            col = mix(col, env, envAmt);
+        } else if (compositorBlur > 1.5) {
+            // Composite the reflection over the translucent tint (premultiplied).
+            vec4 pm = vec4(col * alpha, alpha) * (1.0 - envAmt) + vec4(env * envAmt, envAmt);
+            alpha = pm.a;
+            col = alpha > 1e-4 ? pm.rgb / alpha : env;
+        } else {
+            col = mix(col, env, envAmt);
+        }
 
         // Specular rim: a crisp 1–1.5 px highlight concentrated where the
         // rim faces the light, plus a fainter counter-highlight opposite.

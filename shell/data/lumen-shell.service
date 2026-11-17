@@ -1,0 +1,17 @@
+[Unit]
+Description=LUMEN desktop shell
+PartOf=graphical-session.target
+After=plasma-kwin_wayland.service
+Requires=plasma-kwin_wayland.service
+
+[Service]
+ExecStart=/usr/bin/lumen-shell
+Restart=on-failure
+RestartSec=1
+Slice=session.slice
+# The shell is an unprivileged Wayland client; everything privileged goes
+# through polkit-guarded D-Bus services.
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=plasma-workspace.target

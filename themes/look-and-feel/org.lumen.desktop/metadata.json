@@ -1,0 +1,13 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [ { "Name": "LUMEN OS contributors" } ],
+        "Category": "",
+        "Description": "LUMEN OS global theme: Liquid Glass colours, icons and window decoration",
+        "Id": "org.lumen.desktop",
+        "License": "GPL-3.0-or-later",
+        "Name": "LUMEN",
+        "Version": "1.0"
+    },
+    "X-Plasma-APIVersion": "2"
+}

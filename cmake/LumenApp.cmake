@@ -1,0 +1,23 @@
+# lumen_add_app(<target> URI <uri> [SOURCES ...] [LIBS ...] [DESKTOP file])
+# Builds a LUMEN application: executable + QML module from qml/*.qml and
+# qml/*.js (flattened into the module root), installs binary + desktop file.
+function(lumen_add_app target)
+    cmake_parse_arguments(A "" "URI;DESKTOP;MAIN" "SOURCES;LIBS" ${ARGN})
+    if(NOT A_MAIN)
+        set(A_MAIN src/main.cpp)
+    endif()
+    qt_add_executable(${target} ${A_MAIN})
+    file(GLOB _qml RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} qml/*.qml qml/*.js)
+    foreach(f ${_qml})
+        get_filename_component(_n ${f} NAME)
+        set_source_files_properties(${f} PROPERTIES QT_RESOURCE_ALIAS ${_n})
+    endforeach()
+    qt_add_qml_module(${target} URI ${A_URI} VERSION 1.0 QML_FILES ${_qml} SOURCES ${A_SOURCES}
+        IMPORTS Lumen.Design Lumen.Motion Lumen.Glass Lumen.Controls Lumen.System)
+    target_include_directories(${target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(${target} PRIVATE Qt6::Quick Qt6::Qml LumenControls LumenSystem ${A_LIBS})
+    install(TARGETS ${target} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    if(A_DESKTOP)
+        install(FILES ${A_DESKTOP} DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+    endif()
+endfunction()

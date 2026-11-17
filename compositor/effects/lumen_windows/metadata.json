@@ -1,0 +1,14 @@
+{
+    "KPackageStructure": "KWin/Effect",
+    "KPlugin": {
+        "Id": "lumen_windows",
+        "Name": "LUMEN Window Motion",
+        "Description": "Window open, close and minimize animations using LUMEN motion tokens.",
+        "Category": "Appearance",
+        "EnabledByDefault": true,
+        "License": "GPL-3.0-or-later"
+    },
+    "X-KDE-Ordering": 60,
+    "X-Plasma-API": "javascript",
+    "X-KWin-Exclusive-Category": "toplevel-open-close-animation"
+}

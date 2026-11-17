@@ -1,0 +1,10 @@
+{
+    "KPackageStructure": "KWin/WindowSwitcher",
+    "KPlugin": {
+        "Id": "lumen-switcher",
+        "Name": "LUMEN App Switcher",
+        "Description": "Large application icons on a Liquid Glass shelf",
+        "License": "GPL-3.0-or-later"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

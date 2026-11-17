@@ -1,0 +1,6 @@
+find_package(KDecoration3 REQUIRED)
+find_package(KF6CoreAddons REQUIRED)
+add_library(org.lumen.decoration MODULE lumendecoration.cpp lumendecoration.h)
+set_target_properties(org.lumen.decoration PROPERTIES PREFIX "")
+target_link_libraries(org.lumen.decoration PRIVATE KDecoration3::KDecoration KF6::CoreAddons Qt6::Gui)
+install(TARGETS org.lumen.decoration DESTINATION ${CMAKE_INSTALL_LIBDIR}/qt6/plugins/org.kde.kdecoration3)

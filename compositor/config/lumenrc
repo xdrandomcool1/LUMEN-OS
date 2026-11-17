@@ -1,0 +1,17 @@
+# LUMEN OS — system defaults for the shell and Lumen apps (/etc/xdg/lumen/lumenrc)
+[Appearance]
+mode=auto
+accent=blue
+reduceTransparency=false
+increaseContrast=false
+reduceMotion=false
+glassIntensity=1
+
+[Dock]
+iconSize=52
+magnification=true
+magnifiedSize=84
+autoHide=false
+
+[Wallpaper]
+dynamic=lumen

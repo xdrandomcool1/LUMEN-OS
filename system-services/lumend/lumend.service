@@ -1,0 +1,24 @@
+[Unit]
+Description=LUMEN session daemon (search index)
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=org.lumen.Search
+ExecStart=/usr/libexec/lumend
+Restart=on-failure
+Slice=background.slice
+Nice=10
+IOSchedulingClass=idle
+# Hardening: read-only view of the system, no privilege escalation.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=plasma-workspace.target

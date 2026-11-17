@@ -1,0 +1,75 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// LUMEN OS boot splash: the logo fades in with a slow glow, a thin progress
+// bar fills beneath it; LUKS passphrase prompts appear as a capsule field.
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+W = Window.GetWidth(); H = Window.GetHeight();
+scale = Math.Min(W / 1920, H / 1080);
+if (scale < 0.6) scale = 0.6;
+
+logo_img = Image("logo.png");
+logo_img = logo_img.Scale(logo_img.GetWidth() * scale, logo_img.GetHeight() * scale);
+logo = Sprite(logo_img);
+logo.SetX(W / 2 - logo_img.GetWidth() / 2);
+logo.SetY(H / 2 - logo_img.GetHeight() / 2 - 30 * scale);
+logo.SetOpacity(0);
+
+glow_img = Image("glow.png");
+glow_img = glow_img.Scale(glow_img.GetWidth() * scale, glow_img.GetHeight() * scale);
+glow = Sprite(glow_img);
+glow.SetX(W / 2 - glow_img.GetWidth() / 2);
+glow.SetY(H / 2 - glow_img.GetHeight() / 2 - 30 * scale);
+glow.SetOpacity(0);
+glow.SetZ(-1);
+
+bar_w = 220 * scale; bar_h = 5 * scale;
+track = Sprite(Image("track.png").Scale(bar_w, bar_h));
+track.SetX(W / 2 - bar_w / 2); track.SetY(H / 2 + 110 * scale);
+track.SetOpacity(0);
+fill_img = Image("fill.png");
+fill = Sprite();
+fill.SetX(W / 2 - bar_w / 2); fill.SetY(H / 2 + 110 * scale);
+
+t = 0;
+progress = 0;
+fun refresh_cb() {
+    t++;
+    a = Math.Min(t / 50, 1);                       // ~1 s fade-in at 50 fps
+    logo.SetOpacity(a);
+    track.SetOpacity(a * 0.35);
+    glow.SetOpacity(a * (0.55 + 0.25 * Math.Sin(t / 30)));
+    w = Math.Max(bar_h, bar_w * progress);
+    fill.SetImage(fill_img.Scale(w, bar_h));
+    fill.SetOpacity(a);
+}
+Plymouth.SetRefreshFunction(refresh_cb);
+
+fun progress_cb(duration, p) { if (p > progress) progress = p; }
+Plymouth.SetBootProgressFunction(progress_cb);
+
+// ---- Passphrase (disk encryption) -----------------------------------------
+prompt_box = Sprite(); prompt_text = Sprite(); bullets = Sprite();
+fun display_password_cb(prompt, count) {
+    box = Image("field.png").Scale(260 * scale, 36 * scale);
+    prompt_box.SetImage(box);
+    prompt_box.SetX(W / 2 - box.GetWidth() / 2); prompt_box.SetY(H / 2 + 150 * scale); prompt_box.SetOpacity(1);
+    txt = Image.Text(prompt, 1, 1, 1, 0.8, "Inter 12");
+    prompt_text.SetImage(txt);
+    prompt_text.SetX(W / 2 - txt.GetWidth() / 2); prompt_text.SetY(H / 2 + 125 * scale); prompt_text.SetOpacity(1);
+    s = "";
+    for (i = 0; i < count && i < 24; i++) s += "●";
+    b = Image.Text(s, 1, 1, 1, 1, "Inter 12");
+    bullets.SetImage(b);
+    bullets.SetX(W / 2 - b.GetWidth() / 2); bullets.SetY(H / 2 + 150 * scale + (36 * scale - b.GetHeight()) / 2); bullets.SetZ(10); bullets.SetOpacity(1);
+}
+fun display_normal_cb() { prompt_box.SetOpacity(0); prompt_text.SetOpacity(0); bullets.SetOpacity(0); }
+Plymouth.SetDisplayPasswordFunction(display_password_cb);
+Plymouth.SetDisplayNormalFunction(display_normal_cb);
+
+message = Sprite();
+fun message_cb(text) {
+    img = Image.Text(text, 1, 1, 1, 0.7, "Inter 11");
+    message.SetImage(img); message.SetX(W / 2 - img.GetWidth() / 2); message.SetY(H - 60 * scale);
+}
+Plymouth.SetMessageFunction(message_cb);

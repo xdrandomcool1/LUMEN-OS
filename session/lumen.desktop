@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=LUMEN
+Comment=The LUMEN desktop
+Exec=/usr/bin/startlumen
+TryExec=/usr/bin/startlumen
+DesktopNames=LUMEN;KDE
+X-KDE-PluginInfo-Version=1.0

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Screenshot
+GenericName=Screen Capture
+Comment=Capture the screen, a window or a selection
+Exec=lumen-screenshot
+Icon=lumen-screenshot
+Categories=Utility;Graphics;
+Keywords=screenshot;capture;screen;
+X-KDE-DBUS-Restricted-Interfaces=org.kde.KWin.ScreenShot2

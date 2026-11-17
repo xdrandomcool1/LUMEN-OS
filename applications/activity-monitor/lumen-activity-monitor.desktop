@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Activity Monitor
+GenericName=System Monitor
+Comment=See what is using your computer's resources
+Exec=lumen-activity-monitor
+Icon=lumen-activity-monitor
+Categories=System;Monitor;
+Keywords=processes;cpu;memory;task manager;kill;

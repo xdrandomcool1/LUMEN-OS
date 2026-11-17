@@ -1,0 +1,22 @@
+# Applied by Plasma's look-and-feel machinery (written to ~/.config/kdedefaults,
+# which takes precedence over /etc/xdg). Must match compositor/config/*.
+[kdeglobals][KDE]
+widgetStyle=Breeze
+
+[kdeglobals][General]
+ColorScheme=LumenDark
+AccentColor=10,132,255
+
+[kdeglobals][Icons]
+Theme=Lumen
+
+[kcminputrc][Mouse]
+cursorTheme=breeze_cursors
+
+[kwinrc][org.kde.kdecoration2]
+library=org.lumen.decoration
+theme=
+
+[ksplashrc][KSplash]
+Engine=none
+Theme=None

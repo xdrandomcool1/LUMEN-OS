@@ -30,7 +30,9 @@
 
 namespace KWin {
 class BackgroundEffectItem;
+class LayerSurfaceV1Interface;
 class RenderView;
+class SurfaceInterface;
 }
 
 namespace Lumen {
@@ -88,7 +90,8 @@ private:
         std::unordered_map<KWin::RenderView *, RenderData> render;
     };
 
-    static QString keyFor(KWin::EffectWindow *w);
+    QString keyFor(KWin::EffectWindow *w) const;
+    void layerSurfaceCreated(KWin::LayerSurfaceV1Interface *surface);
     void windowAdded(KWin::EffectWindow *w);
     void windowDeleted(KWin::EffectWindow *w);
     void applyShapes(KWin::EffectWindow *w);
@@ -103,6 +106,9 @@ private:
     bool m_valid = false;
     KWin::RenderView *m_currentView = nullptr;
     QHash<QString, QList<GlassShape>> m_published; // key: scope|output
+    //! Layer-shell scope per wl_surface. LayerShellV1Window is not exported
+    //! by KWin, so scopes are learnt from LayerShellV1Interface::surfaceCreated.
+    QHash<KWin::SurfaceInterface *, QString> m_scopes;
     std::unordered_map<KWin::EffectWindow *, WindowData> m_windows;
 };
 

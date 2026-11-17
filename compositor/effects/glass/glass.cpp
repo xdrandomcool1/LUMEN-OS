@@ -9,10 +9,11 @@
 #include <core/renderviewport.h>
 #include <effect/effecthandler.h>
 #include <effect/effectwindow.h>
-#include <layershellv1window.h>
 #include <opengl/eglcontext.h>
 #include <scene/backgroundeffectitem.h>
 #include <wayland/layershell_v1.h>
+#include <wayland/surface.h>
+#include <wayland_server.h>
 
 #include <QDBusConnection>
 #include <QDBusMessage>
@@ -63,6 +64,16 @@ GlassEffect::GlassEffect()
     m_loc.opacity = m_shader->uniformLocation("opacity");
     m_valid = true;
 
+    // Learn the scope of every layer surface created from now on (shells
+    // start after KWin has loaded its effects).
+    if (WaylandServer *server = waylandServer()) {
+        const auto shells = server->findChildren<LayerShellV1Interface *>();
+        for (LayerShellV1Interface *shell : shells)
+            connect(shell, &LayerShellV1Interface::surfaceCreated, this, &GlassEffect::layerSurfaceCreated);
+        if (shells.isEmpty())
+            qCWarning(LUMEN_GLASS) << "No layer-shell interface found; shell glass will not be refracted";
+    }
+
     connect(effects, &EffectsHandler::windowAdded, this, &GlassEffect::windowAdded);
     connect(effects, &EffectsHandler::windowDeleted, this, &GlassEffect::windowDeleted);
     const auto windows = effects->stackingOrder();
@@ -93,16 +104,31 @@ bool GlassEffect::isActive() const
     return m_valid && !m_windows.empty();
 }
 
-QString GlassEffect::keyFor(EffectWindow *w)
+QString GlassEffect::keyFor(EffectWindow *w) const
 {
-    auto *layer = qobject_cast<LayerShellV1Window *>(w->window());
-    if (!layer || !layer->shellSurface())
+    SurfaceInterface *surface = w->surface();
+    if (!surface)
         return {};
-    const QString scope = layer->shellSurface()->scope();
+    const QString scope = m_scopes.value(surface);
     if (!scope.startsWith(QLatin1String("lumen-")))
         return {};
     const QString output = w->screen() ? w->screen()->name() : QString();
     return scope + QLatin1Char('|') + output;
+}
+
+void GlassEffect::layerSurfaceCreated(LayerSurfaceV1Interface *layerSurface)
+{
+    SurfaceInterface *surface = layerSurface->surface();
+    if (!surface || !layerSurface->scope().startsWith(QLatin1String("lumen-")))
+        return;
+    m_scopes.insert(surface, layerSurface->scope());
+    connect(layerSurface, &QObject::destroyed, this, [this, surface] { m_scopes.remove(surface); });
+    // The window may already exist (signal order is not guaranteed).
+    const auto windows = effects->stackingOrder();
+    for (EffectWindow *w : windows) {
+        if (w->surface() == surface)
+            applyShapes(w);
+    }
 }
 
 void GlassEffect::windowAdded(EffectWindow *w)

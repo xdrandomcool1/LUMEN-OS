@@ -99,6 +99,7 @@ export QT_QPA_PLATFORM=offscreen
 %{_libdir}/qt6/plugins/kwin/effects/plugins/lumen_glass.so
 %{_datadir}/kwin/effects/lumen_windows/
 %{_datadir}/kwin/tabbox/lumen-switcher/
+%{_datadir}/plasma/look-and-feel/org.lumen.desktop/
 %{_datadir}/applications/lumen-shell.desktop
 %{_datadir}/wayland-sessions/lumen.desktop
 %{_datadir}/dbus-1/services/org.lumen.Search.service
@@ -118,6 +119,7 @@ export QT_QPA_PLATFORM=offscreen
 %config(noreplace) %{_sysconfdir}/xdg/kdeglobals
 %config(noreplace) %{_sysconfdir}/xdg/kcminputrc
 %config(noreplace) %{_sysconfdir}/xdg/kscreenlockerrc
+%config(noreplace) %{_sysconfdir}/xdg/plasma-welcomerc
 %config(noreplace) %{_sysconfdir}/xdg/lumen/
 
 %files -n lumen-apps

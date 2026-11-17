@@ -107,9 +107,17 @@ ordered layers (`shaders/glass.frag`):
 5. **Shadow** – an outer, very soft ambient shadow + a tighter contact shadow
    (drawn as a separate SDF pass outside the surface).
 
-Surfaces without an in-scene backdrop (e.g. the Dock while a window overlaps
-it) cannot refract: they fall back to tint + light over the compositor's
-blur.
+Shell surfaces whose glass sits over other clients (the Dock over a
+maximised window, Control Center over a browser) are refracted by the
+compositor: the KWin effect `lumen_glass` (`compositor/effects/glass`)
+copies the already composited pixels behind each glass shape and draws them
+back through the same bevel/Snell model (frost via the texture's mip chain).
+The shell publishes its shapes with `CompositorGlass` (D-Bus
+`org.kde.KWin /org/lumen/Glass org.lumen.Glass.SetShapes`) and the surface
+then draws only tint, Fresnel and specular light (`compositorBlur` mode 2).
+Without the effect (no OpenGL compositing) the shell falls back to
+refracting its own wallpaper copy, and to KWin's blur when a window is
+underneath.
 
 Values from `rendering/src/materials.h` (refr/lens in px):
 

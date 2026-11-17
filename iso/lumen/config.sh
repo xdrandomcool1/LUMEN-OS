@@ -37,6 +37,7 @@ chmod 0440 /etc/sudoers.d/liveuser
 passwd -d liveuser
 mkdir -p /home/liveuser/.config/lumen
 cp /etc/skel/.config/lumen/lumenrc /home/liveuser/.config/lumen/lumenrc
+cp /etc/skel/.config/kdeglobals /home/liveuser/.config/kdeglobals
 # Pin the installer in the live session's Dock.
 sed -i 's|^pinned=|pinned=applications:calamares.desktop,|' /home/liveuser/.config/lumen/lumenrc
 chown -R liveuser: /home/liveuser

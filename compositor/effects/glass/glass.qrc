@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/effects/lumen_glass/">
+  <file>shaders/glass.vert</file>
+  <file>shaders/glass.frag</file>
+</qresource>
+</RCC>

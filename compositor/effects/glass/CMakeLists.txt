@@ -1,0 +1,15 @@
+# lumen_glass: compositor-side Liquid Glass for shell surfaces.
+# KWin's exported target does not resolve its own dependencies; find them.
+find_package(Qt6 REQUIRED COMPONENTS Widgets DBus Quick)
+find_package(KF6Config REQUIRED)
+find_package(KF6CoreAddons REQUIRED)
+find_package(KF6WindowSystem REQUIRED)
+find_package(Vulkan QUIET)
+if(NOT TARGET Vulkan::Vulkan)
+    add_library(Vulkan::Vulkan INTERFACE IMPORTED)
+endif()
+find_package(KWin REQUIRED COMPONENTS kwin)
+add_library(lumen_glass MODULE glass.cpp glass.h glass.qrc)
+set_target_properties(lumen_glass PROPERTIES PREFIX "" AUTORCC ON)
+target_link_libraries(lumen_glass PRIVATE KWin::kwin Qt6::DBus Qt6::Gui)
+install(TARGETS lumen_glass DESTINATION ${CMAKE_INSTALL_LIBDIR}/qt6/plugins/kwin/effects/plugins)

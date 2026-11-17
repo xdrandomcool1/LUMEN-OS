@@ -1,0 +1,6 @@
+add_subdirectory(screenshot)
+add_subdirectory(calculator)
+add_subdirectory(calendar)
+add_subdirectory(texteditor)
+add_subdirectory(imageviewer)
+add_subdirectory(mediaplayer)

@@ -1,0 +1,5 @@
+[Icons]
+Theme=Lumen
+
+[KDE]
+LookAndFeelPackage=org.lumen.desktop

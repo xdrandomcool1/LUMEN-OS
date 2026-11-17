@@ -1,0 +1,14 @@
+# Defaults applied by Plasma for the LUMEN look-and-feel (referenced by
+# /etc/xdg/kdeglobals [KDE] LookAndFeelPackage). Without this package Plasma
+# falls back to Breeze and writes Breeze icons into the user's kdeglobals.
+[kdeglobals][General]
+ColorScheme=LumenDark
+
+[kdeglobals][Icons]
+Theme=Lumen
+
+[kdeglobals][KDE]
+widgetStyle=Breeze
+
+[kwinrc][org.kde.kdecoration2]
+library=org.lumen.decoration

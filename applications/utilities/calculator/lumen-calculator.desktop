@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Calculator
+GenericName=Calculator
+Exec=lumen-calculator
+Icon=lumen-calculator
+Terminal=false
+Categories=Utility;Calculator;
+Keywords=calculator;math;arithmetic;

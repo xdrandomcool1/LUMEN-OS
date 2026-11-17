@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Id": "org.lumen.decoration",
+        "Name": "LUMEN",
+        "Description": "LUMEN OS window decoration",
+        "License": "GPL-3.0-or-later"
+    },
+    "X-KDE-ConfigModule": "",
+    "org.kde.kdecoration3": {
+        "blur": false,
+        "kcmodule": false,
+        "recommendedBorderSize": "None"
+    }
+}

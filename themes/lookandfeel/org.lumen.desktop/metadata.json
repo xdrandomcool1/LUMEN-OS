@@ -1,0 +1,11 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [ { "Name": "LUMEN OS" } ],
+        "Description": "LUMEN OS: Liquid Glass shell, Lumen icons and colours",
+        "Id": "org.lumen.desktop",
+        "License": "GPL-3.0-or-later",
+        "Name": "LUMEN",
+        "Version": "1.0"
+    }
+}

@@ -1,0 +1,6 @@
+add_subdirectory(utilities)
+add_subdirectory(finder)
+add_subdirectory(settings)
+add_subdirectory(terminal)
+add_subdirectory(activity-monitor)
+add_subdirectory(store)

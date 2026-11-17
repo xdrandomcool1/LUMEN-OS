@@ -1,0 +1,24 @@
+# LUMEN OS — default global shortcuts (/etc/xdg/kglobalshortcutsrc).
+# Format: Action=Active shortcut(s),Default shortcut(s),Description
+[kwin]
+Walk Through Windows=Meta+Tab\tAlt+Tab,Meta+Tab\tAlt+Tab,Switch between applications
+Walk Through Windows (Reverse)=Meta+Shift+Tab\tAlt+Shift+Tab,Meta+Shift+Tab\tAlt+Shift+Tab,Switch between applications (reverse)
+Window Minimize=Meta+M,Meta+M,Minimize window
+Window Close=Meta+W\tAlt+F4,Meta+W\tAlt+F4,Close window
+Show Desktop=Meta+D,Meta+D,Show desktop
+Overview=Meta+Up\tCtrl+Up,Meta+Up\tCtrl+Up,Mission Control
+ExposeClass=Ctrl+Down,Ctrl+Down,Application windows
+Switch One Desktop to the Left=Ctrl+Left\tMeta+Ctrl+Left,Ctrl+Left\tMeta+Ctrl+Left,Previous desktop
+Switch One Desktop to the Right=Ctrl+Right\tMeta+Ctrl+Right,Ctrl+Right\tMeta+Ctrl+Right,Next desktop
+Window Fullscreen=Meta+Ctrl+F,Meta+Ctrl+F,Enter full screen
+Window Maximize=Meta+PgUp,Meta+PgUp,Zoom window
+
+[lumen-shell]
+toggle-spotlight=Meta+Space,Meta+Space,Show Spotlight
+toggle-control-center=Meta+C,Meta+C,Show Control Center
+toggle-notification-center=Meta+N,Meta+N,Show Notification Center
+toggle-launchpad=Meta+A,Meta+A,Show Launchpad
+
+[ksmserver]
+Lock Session=Meta+Ctrl+Q\tScreensaver,Meta+Ctrl+Q\tScreensaver,Lock screen
+Log Out=Meta+Shift+Q,Meta+Shift+Q,Log out

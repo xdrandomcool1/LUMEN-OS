@@ -1,0 +1,5 @@
+# LUMEN OS has its own first-run experience: never launch Plasma's
+# Welcome Center (it launches when no version was seen yet).
+[General]
+LastSeenVersion=99.0.0
+ShowUpdatePage=false

@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.lumen.Search
+Exec=/usr/libexec/lumend
+SystemdService=lumend.service

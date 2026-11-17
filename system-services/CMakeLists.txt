@@ -7,6 +7,7 @@ add_custom_target(lumend ALL
     COMMENT "Building lumend (cargo)"
     USES_TERMINAL)
 install(PROGRAMS ${LUMEND_TARGET_DIR}/release/lumend DESTINATION ${CMAKE_INSTALL_LIBEXECDIR})
+install(PROGRAMS nvidia/lumen-nvidia-setup DESTINATION ${CMAKE_INSTALL_LIBEXECDIR})
 install(FILES lumend/lumend.service DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/systemd/user)
 install(FILES lumend/org.lumen.Search.service DESTINATION ${CMAKE_INSTALL_DATADIR}/dbus-1/services)
 if(LUMEN_BUILD_TESTS)

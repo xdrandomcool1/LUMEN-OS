@@ -60,7 +60,9 @@ Item {
           a: () => Appearance.mode = Appearance.dark ? Appearance.Light : Appearance.Dark },
         { k: "screenshot screen capture", t: qsTr("Take Screenshot"), i: "selection", a: () => ShellController.takeScreenshot() },
         { k: "mission control overview windows", t: qsTr("Mission Control"), i: "squares-four", a: () => ShellController.showOverview() },
-        { k: "show desktop", t: qsTr("Show Desktop"), i: "desktop", a: () => ShellController.showDesktop() }
+        { k: "show desktop", t: qsTr("Show Desktop"), i: "desktop", a: () => ShellController.showDesktop() },
+        { k: "nvidia graphics driver gpu install", t: qsTr("Install NVIDIA Driver"), i: "cpu", when: () => SystemActions.needsNvidiaDriver,
+          a: () => SystemActions.installNvidiaDriver() }
     ]
 
     function matches(keywords, title, q) {
@@ -88,7 +90,7 @@ Item {
         for (const s of settingsPages)
             if (matches(s.k, s.t, q)) out.push({ section: qsTr("System Settings"), title: s.t, subtitle: qsTr("Settings"), symbol: s.i, run: () => ShellController.openSettings(s.p) })
         for (const a of actions)
-            if (matches(a.k, a.t, q)) out.push({ section: qsTr("Actions"), title: a.t, subtitle: "", symbol: a.i, run: a.a })
+            if ((!a.when || a.when()) && matches(a.k, a.t, q)) out.push({ section: qsTr("Actions"), title: a.t, subtitle: "", symbol: a.i, run: a.a })
         const files = FileSearch.search(q, 8)
         for (const f of files)
             out.push({ section: qsTr("Documents"), title: f.name, subtitle: f.folder, icon: f.iconName, run: () => AppsModel.openUrl(f.url) })

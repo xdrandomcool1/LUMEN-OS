@@ -19,7 +19,7 @@ SettingsPage {
         FormRow { label: qsTr("Name"); TextField { width: 220; text: SystemInfo.hostname; onEditingFinished: if (text !== SystemInfo.hostname) SystemInfo.setHostname(text) } }
         FormRow { label: qsTr("Model"); visible: (page.f.model || "").length > 0; LText { text: (page.f.vendor + " " + page.f.model).trim(); secondary: true } }
         FormRow { label: qsTr("Processor"); LText { text: page.f.cpu + " (" + page.f.cores + qsTr(" threads)"); secondary: true; width: 330; horizontalAlignment: Text.AlignRight } }
-        FormRow { label: qsTr("Graphics"); LText { text: page.f.gpu; secondary: true; width: 330; horizontalAlignment: Text.AlignRight } }
+        FormRow { label: qsTr("Graphics"); LText { text: page.f.gpu + (Gpu.software && Gpu.renderer.length > 0 ? "  ·  " + Gpu.renderer : ""); secondary: true; width: 330; horizontalAlignment: Text.AlignRight; wrapMode: Text.Wrap } }
         FormRow { label: qsTr("Memory"); LText { text: page.bytes(page.f.memory); secondary: true } }
         FormRow { label: qsTr("Storage"); LText { text: qsTr("%1 available of %2").arg(page.bytes(page.f.diskFree)).arg(page.bytes(page.f.diskTotal)); secondary: true } }
         FormRow { label: qsTr("Base system"); LText { text: page.f.os; secondary: true } }

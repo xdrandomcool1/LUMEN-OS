@@ -70,6 +70,9 @@
         <package name="mesa-dri-drivers"/>
         <package name="mesa-vulkan-drivers"/>
         <package name="mesa-va-drivers"/>
+        <package name="intel-media-driver"/>
+        <package name="libva-utils"/>
+        <package name="mokutil"/>
         <package name="xorg-x11-server-Xwayland"/>
         <!-- Networking, audio, bluetooth, power -->
         <package name="NetworkManager-wifi"/>
@@ -82,6 +85,9 @@
         <package name="power-profiles-daemon"/>
         <package name="upower"/>
         <package name="firewalld"/>
+        <!-- Guest integration for VMs (QEMU/Spice) -->
+        <package name="spice-vdagent"/>
+        <package name="qemu-guest-agent"/>
         <!-- Desktop -->
         <package name="lumen-desktop"/>
         <package name="lumen-apps"/>

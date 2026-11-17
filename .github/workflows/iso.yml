@@ -6,6 +6,11 @@ name: ISO
 
 on:
   workflow_dispatch:
+    inputs:
+      boot_test:
+        description: 'Boot the ISO in QEMU after building (adds ~10–30 min)'
+        type: boolean
+        default: false
   push:
     tags: ['v*']
     branches: [main, 'claude/**']
@@ -53,6 +58,16 @@ jobs:
           iso=$(ls *.iso | head -1)
           echo "file=out/iso/$iso" >> "$GITHUB_OUTPUT"
           echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Boot smoke test (QEMU, KVM when available)
+        # Optional (workflow_dispatch only): boots the fresh ISO, waits for the
+        # live session and fails if it never starts. Screenshots, the journal
+        # and the guest diagnostics land in out/glass-test/.
+        if: inputs.boot_test
+        run: |
+          if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm || true; fi
+          scripts/qemu-glass-test.sh "${{ steps.iso.outputs.file }}" 10
+          grep -q "lumen-shell" out/glass-test/journal.log
 
       - name: Publish release
         env:

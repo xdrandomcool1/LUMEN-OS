@@ -1,0 +1,53 @@
+#!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# LUMEN OS — one-click NVIDIA proprietary driver setup (RPM Fusion).
+#
+# Runs as root (invoked via pkexec from the shell's SystemActions). Every
+# step prints one progress line to stdout, which the shell surfaces verbatim;
+# everything is also logged to the journal with the lumen-nvidia-setup tag.
+# Exit codes: 0 ok · 2 no NVIDIA hardware · 3 RPM Fusion setup failed ·
+# 4 driver install failed.
+set -uo pipefail
+
+step() {
+    echo "$1"
+    logger -t lumen-nvidia-setup "$1"
+}
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Must run as root (pkexec)"
+    exit 1
+fi
+
+vendor="$(cat /sys/class/drm/card*/device/vendor 2>/dev/null | sort -u)"
+if ! grep -q 0x10de <<<"$vendor"; then
+    step "No NVIDIA hardware detected — nothing to do."
+    exit 2
+fi
+
+FEDORA_VER="$(rpm -E %fedora 2>/dev/null || echo 45)"
+
+SB_ENABLED=0
+if command -v mokutil >/dev/null 2>&1 && mokutil --sb-state 2>/dev/null | grep -q "SecureBoot enabled"; then
+    SB_ENABLED=1
+    step "WARNING: Secure Boot is enabled — the NVIDIA module will not load until Secure Boot is disabled or a MOK key is enrolled."
+fi
+
+step "Adding the RPM Fusion repositories…"
+dnf -y install \
+    "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VER}.noarch.rpm" \
+    "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VER}.noarch.rpm" || exit 3
+
+step "Installing kernel headers and build tools for the running kernel…"
+dnf -y install "kernel-devel-uname-r == $(uname -r)" gcc make || true
+
+step "Installing akmod-nvidia (downloading the driver)…"
+dnf -y install akmod-nvidia xorg-x11-drv-nvidia || exit 4
+
+step "Building the NVIDIA kernel module (this can take a few minutes)…"
+akmods --force >/dev/null 2>&1 \
+    || step "akmods reported an error; it will retry automatically on the next boot."
+
+step "Done. Reboot to activate the NVIDIA driver."
+[ "$SB_ENABLED" = 1 ] && step "Remember: Secure Boot must be disabled for the module to load."
+exit 0

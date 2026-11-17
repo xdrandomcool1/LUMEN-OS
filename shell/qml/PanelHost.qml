@@ -45,7 +45,7 @@ Window {
 
     // In-process backdrop: the wallpaper (never shown, only refracted).
     Wallpaper { id: wall; anchors.fill: parent; animate: false }
-    BackdropBlur { id: blur; source: wall; hideSource: true }
+    BackdropBlur { id: blur; source: wall; hideSource: true; active: !Gpu.software }
 
     // Use compositor blur whenever a window is underneath the open panel.
     RegionWatcher {
@@ -53,8 +53,9 @@ Window {
         model: ShellState.windows
         region: win.activeRect
     }
-    readonly property BackdropBlur glassBackdrop: occlusion.occupied || kwinGlass.active ? null : blur
-    readonly property bool glassCompositor: occlusion.occupied || kwinGlass.active
+    readonly property BackdropBlur glassBackdrop: Gpu.software ? null
+                                                 : (occlusion.occupied || kwinGlass.active ? null : blur)
+    readonly property bool glassCompositor: !Gpu.software && (occlusion.occupied || kwinGlass.active)
 
     // Compositor-side Liquid Glass behind the open panel (see Dock.qml).
     readonly property bool lumenCompositorGlass: kwinGlass.active
@@ -63,7 +64,7 @@ Window {
         id: kwinGlass
         scope: "lumen-panels"
         output: win.targetScreen ? win.targetScreen.name : ""
-        enabled: win.open && win.activeRect.width > 0
+        enabled: !Gpu.software && win.open && win.activeRect.width > 0
         shapes: [{
             x: win.activeRect.x, y: win.activeRect.y, w: win.activeRect.width, h: win.activeRect.height,
             r: win.activeRadius, n: 2.6,
@@ -76,7 +77,7 @@ Window {
     WindowEffects {
         window: win
         shadow: false
-        blurBehind: !kwinGlass.active && win.open && occlusion.occupied && win.activeRect.width > 0
+        blurBehind: !Gpu.software && !kwinGlass.active && win.open && occlusion.occupied && win.activeRect.width > 0
         blurRect: win.activeRect
         radius: win.activeRadius
     }

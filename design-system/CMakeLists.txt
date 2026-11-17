@@ -9,6 +9,7 @@ qt_add_qml_module(LumenDesign
     PLUGIN_TARGET LumenDesignPlugin
     SOURCES
         src/appearance.h src/appearance.cpp
+        src/gpu.h src/gpu.cpp
         src/symbol.h src/symbol.cpp
     QML_FILES
         qml/Theme.qml

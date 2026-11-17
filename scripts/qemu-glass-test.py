@@ -86,8 +86,9 @@ AS_USER = ("U=$(id -u liveuser); sudo -u liveuser XDG_RUNTIME_DIR=/run/user/$U "
 
 def diag():
     checks = [
-        ("lumen_glass D-Bus Available()",
-         AS_USER + "busctl --user call org.kde.KWin /org/lumen/Glass org.lumen.Glass Available"),
+        ("lumen_glass D-Bus Available() (absent without GPU compositing — expected on the software tier)",
+         AS_USER + "busctl --user call org.kde.KWin /org/lumen/Glass org.lumen.Glass Available"
+         ' || echo "EFFECT-UNAVAILABLE (software tier or not loaded)"'),
         ("loaded KWin effects",
          AS_USER + "busctl --user get-property org.kde.KWin /Effects org.kde.kwin.Effects loadedEffects"),
         ("KWin compositing",
@@ -102,6 +103,10 @@ def diag():
          " && test -x /mnt/lb/usr/bin/bash && echo LIVE-BASE-OK; umount /mnt/lb 2>/dev/null;"
          " test -d /run/rootfsbase/usr/bin && echo ROOTFSBASE-OK || echo ROOTFSBASE-ABSENT"),
         ("calamares", "rpm -q calamares lumen-installer; ls /etc/calamares /usr/share/calamares 2>/dev/null | head"),
+        ("pinned Firefox desktop file (must match the pinned launcher)",
+         "ls /usr/share/applications | grep -i firefox || echo none"),
+        ("NVIDIA one-click setup helper", "test -x /usr/libexec/lumen-nvidia-setup && echo HELPER-OK || echo HELPER-ABSENT"),
+        ("VA-API (hardware video decode)", "ls /usr/lib64/dri 2>/dev/null | head; libva-info 2>/dev/null | head -5 || echo no"),
     ]
     with open(f"{OUT}/diag.txt", "w") as out:
         for title, cmd in checks:

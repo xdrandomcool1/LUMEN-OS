@@ -42,6 +42,13 @@ cp /etc/skel/.config/kdeglobals /home/liveuser/.config/kdeglobals
 sed -i 's|^pinned=|pinned=applications:calamares.desktop,|' /home/liveuser/.config/lumen/lumenrc
 chown -R liveuser: /home/liveuser
 
+# The Firefox RPM renamed its desktop file (firefox.desktop →
+# org.mozilla.firefox.desktop in Fedora 40); pin whatever id this image
+# actually ships so the Dock launcher never falls back to a generic icon.
+if ff="$(ls /usr/share/applications 2>/dev/null | grep -E '^org\.mozilla\.firefox\.desktop$|^firefox-rpm\.desktop$|^firefox\.desktop$' | head -1)" && [ -n "$ff" ]; then
+    sed -i "s|applications:org\.mozilla\.firefox\.desktop|applications:${ff}|" /etc/skel/.config/lumen/lumenrc
+fi
+
 # --- Apps -------------------------------------------------------------------------
 flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || true
 

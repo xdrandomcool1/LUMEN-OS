@@ -2,6 +2,7 @@
 // Background layer: wallpaper (+ desktop widgets).
 import QtQuick
 import QtQuick.Window
+import Lumen.Design
 import Lumen.Glass
 import Lumen.Shell
 import Lumen.System
@@ -25,7 +26,7 @@ Window {
         scope: "lumen-desktop"
     }
     Wallpaper { id: wall; anchors.fill: parent }
-    BackdropBlur { id: blur; source: wall }
+    BackdropBlur { id: blur; source: wall; active: !Gpu.software }
     DesktopWidgets { anchors.fill: parent; anchors.topMargin: 40; backdrop: blur }
     Component.onCompleted: visible = true
 }

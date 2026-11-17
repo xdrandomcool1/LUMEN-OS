@@ -66,8 +66,18 @@ Item {
     readonly property var params: Glass.material(material, Appearance.dark, Appearance.accent)
 
     readonly property bool _opaqueFallback: Appearance.reduceTransparency
+    //! Software rendering (llvmpipe & friends): the refraction shader and the
+    //! blur pyramid would run on the CPU, so the surface falls back to a plain
+    //! translucent panel — the macOS "reduce transparency" look, for speed.
+    readonly property bool _software: Gpu.software
     readonly property real _shadowRadius: shadowEnabled ? params.shadowRadius * shadowScale : 0
     readonly property real _pad: Math.ceil(_shadowRadius * 1.6 + Math.abs(shadowOffsetY) + 2)
+    readonly property color _plainTint: {
+        const a = 0.97
+        if (tintColor.a > 0)
+            return Qt.rgba(tintColor.r, tintColor.g, tintColor.b, a)
+        return Qt.rgba(params.tint.x, params.tint.y, params.tint.z, a)
+    }
 
     BackdropTracker {
         id: tracker
@@ -83,13 +93,22 @@ Item {
         layer.enabled: !root.backdrop
     }
 
+    Rectangle {
+        anchors.fill: parent
+        visible: root._software
+        radius: root.radius
+        color: root._plainTint
+        border.width: 1
+        border.color: Appearance.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.10)
+    }
+
     ShaderEffect {
         id: fx
         x: -root._pad
         y: -root._pad
         width: root.width + root._pad * 2
         height: root.height + root._pad * 2
-        visible: root.width > 0 && root.height > 0
+        visible: !root._software && root.width > 0 && root.height > 0
         fragmentShader: "qrc:/lumen/shaders/glass.frag.qsb"
         blending: true
 

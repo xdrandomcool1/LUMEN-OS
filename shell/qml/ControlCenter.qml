@@ -160,6 +160,54 @@ GlassSurface {
                 }
             }
 
+            // ===== Graphics: renderer status + one-click NVIDIA driver ======
+            CCModule {
+                id: gpuModule
+                width: parent.width
+                height: gpuModule.installed ? 96 : 122
+                property bool installed: false
+                visible: SystemActions.needsNvidiaDriver || SystemActions.installing || installed
+                Connections { target: SystemActions; function onDone() { gpuModule.installed = true } }
+                Column {
+                    anchors.fill: parent; spacing: 8
+                    LText { text: qsTr("Graphics"); style: LText.Callout; font.weight: Font.DemiBold }
+                    LText {
+                        width: parent.width
+                        text: Gpu.renderer + (Gpu.software ? "  ·  " + qsTr("software rendering") : "")
+                        style: LText.Caption; secondary: true
+                        elide: Text.ElideRight
+                    }
+                    Button {
+                        visible: SystemActions.needsNvidiaDriver && !SystemActions.installing && !gpuModule.installed
+                        text: qsTr("Install NVIDIA Driver")
+                        kind: Button.Prominent
+                        onClicked: SystemActions.installNvidiaDriver()
+                    }
+                    LText {
+                        visible: SystemActions.installing
+                        width: parent.width
+                        text: SystemActions.status
+                        style: LText.Caption; secondary: true
+                        elide: Text.ElideRight
+                    }
+                    LText {
+                        visible: gpuModule.installed
+                        width: parent.width
+                        text: qsTr("Driver installed — reboot to activate it.")
+                        style: LText.Caption
+                        color: Theme.accent
+                        elide: Text.ElideRight
+                    }
+                    LText {
+                        visible: SystemActions.needsNvidiaDriver && !gpuModule.installed && !SystemActions.installing
+                        width: parent.width
+                        text: qsTr("Hardware acceleration is limited until the driver is installed.")
+                        style: LText.Caption; secondary: true
+                        elide: Text.ElideRight
+                    }
+                }
+            }
+
             Row {
                 spacing: 12
                 Repeater {

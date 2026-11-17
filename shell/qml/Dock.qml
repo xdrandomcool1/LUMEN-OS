@@ -96,7 +96,7 @@ Window {
         height: win.targetScreen ? win.targetScreen.height : 800
         y: win.height - height
     }
-    BackdropBlur { id: blur; source: wall; hideSource: true; strength: 0.8 }
+    BackdropBlur { id: blur; source: wall; hideSource: true; strength: 0.8; active: !Gpu.software }
 
     RegionWatcher {
         id: occlusion
@@ -114,13 +114,13 @@ Window {
         id: kwinGlass
         scope: "lumen-dock"
         output: win.targetScreen ? win.targetScreen.name : ""
-        enabled: hidden.value < 0.95
+        enabled: !Gpu.software && hidden.value < 0.95
         shapes: [ dockGlass.compositorShape(Qt.rect(win.dockRect.x, win.dockRect.y, win.dockRect.width, win.glassH)) ]
     }
     WindowEffects {
         window: win
         shadow: false
-        blurBehind: !kwinGlass.active && occlusion.occupied && hidden.value < 0.95
+        blurBehind: !Gpu.software && !kwinGlass.active && occlusion.occupied && hidden.value < 0.95
         blurRect: win.dockRect
         radius: dockGlass.radius
     }
@@ -136,8 +136,8 @@ Window {
         height: win.glassH
         radius: Math.round(height * 0.42)
         material: Glass.UltraThin
-        backdrop: occlusion.occupied || kwinGlass.active ? null : blur
-        compositorBlur: occlusion.occupied || kwinGlass.active
+        backdrop: Gpu.software ? null : (occlusion.occupied || kwinGlass.active ? null : blur)
+        compositorBlur: !Gpu.software && (occlusion.occupied || kwinGlass.active)
         shadowScale: 1.0
         shadowOffsetY: 8
     }

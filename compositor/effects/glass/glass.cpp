@@ -97,7 +97,15 @@ GlassEffect::~GlassEffect()
 
 bool GlassEffect::supported()
 {
-    return effects->isOpenGLCompositing();
+    if (!effects->isOpenGLCompositing())
+        return false;
+    if (qEnvironmentVariableIsSet("LUMEN_FORCE_GLASS"))
+        return true;
+    // The device-resolution backdrop capture and the refraction pass are far
+    // too heavy for software rasterisers (llvmpipe in VMs); KWin's own blur
+    // skips those machines the same way. The shell falls back to its tint.
+    const auto context = effects->openglContext();
+    return context && !context->isSoftwareRenderer();
 }
 
 bool GlassEffect::isActive() const

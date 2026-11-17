@@ -92,6 +92,7 @@ export QT_QPA_PLATFORM=offscreen
 %{_bindir}/lumen-shell
 %{_bindir}/startlumen
 %{_libexecdir}/lumend
+%{_libexecdir}/lumen-nvidia-setup
 %{_libdir}/libLumen*.so*
 %{_libdir}/qt6/qml/Lumen/
 %{_libdir}/qt6/plugins/org.kde.kdecoration3/org.lumen.decoration.so

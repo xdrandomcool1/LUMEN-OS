@@ -54,14 +54,14 @@ AppWindow {
                 Component { id: sepC; Item { height: 10 } }
                 Component {
                     id: itemC
-                    Item {
-                        height: 30
-                        Rectangle { anchors.fill: parent; anchors.leftMargin: 8; anchors.rightMargin: 8; radius: 8
-                                    color: win.current === modelData.id ? Theme.controlFillPressed : (ma.containsMouse ? Theme.controlFill : "transparent") }
-                        Rectangle { x: 16; anchors.verticalCenter: parent.verticalCenter; width: 22; height: 22; radius: 6; color: modelData.tint
-                            Symbol { anchors.centerIn: parent; width: 14; height: 14; name: modelData.symbol; weight: Symbol.Fill; color: "white" } }
-                        LText { x: 46; anchors.verticalCenter: parent.verticalCenter; text: modelData.title }
-                        MouseArea { id: ma; anchors.fill: parent; hoverEnabled: true; onClicked: win.current = modelData.id }
+                    SidebarItem {
+                        x: 8; width: (parent ? parent.width : 200) - 16; height: 30
+                        text: modelData.title
+                        symbol: modelData.symbol
+                        symbolColor: modelData.tint
+                        chip: true
+                        selected: win.current === modelData.id
+                        onClicked: win.current = modelData.id
                     }
                 }
             }

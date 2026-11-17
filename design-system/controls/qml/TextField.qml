@@ -31,7 +31,7 @@ T.TextField {
     }
 
     background: Rectangle {
-        radius: control.capsule ? height / 2 : 7
+        radius: control.capsule ? height / 2 : Theme.metrics.controlRadius
         color: Theme.dark ? Qt.rgba(1, 1, 1, 0.07) : "white"
         border.width: 0.5
         border.color: Theme.controlBorder

@@ -42,7 +42,8 @@ QtObject {
         readonly property real dockPadding: 6
         readonly property real dockGap: 8
         readonly property real windowRadius: 16
-        readonly property real toolbarWindowRadius: 24
+        readonly property real cardRadius: 12
+        readonly property real hoverRadius: 8
         readonly property real titleBarHeight: 32
         readonly property real toolbarHeight: 52
         readonly property real trafficLight: 12

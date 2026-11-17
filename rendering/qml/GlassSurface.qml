@@ -23,7 +23,7 @@ Item {
     property int material: Glass.Regular
     property BackdropBlur backdrop: null
     property bool blurred: true
-    property real radius: 18
+    property real radius: Theme.metrics.windowRadius
     //! Corner exponent: 2 = circular arcs, 2.6 ≈ continuous corners.
     property real smoothness: 2.6
     property bool shadowEnabled: true

@@ -36,7 +36,7 @@ T.ComboBox {
         renderType: Text.QtRendering
     }
     background: Rectangle {
-        radius: 6
+        radius: Theme.metrics.controlRadius
         color: Theme.controlBackground
         border.width: 0.5
         border.color: Theme.controlBorder
@@ -53,7 +53,7 @@ T.ComboBox {
             currentIndex: control.highlightedIndex
         }
         background: GlassSurface {
-            radius: 12; material: Glass.Thin
+            radius: Theme.metrics.menuRadius; material: Glass.Thin
             backdrop: (control.Window.window && control.Window.window.lumenBackdrop) ? control.Window.window.lumenBackdrop : null
         }
     }

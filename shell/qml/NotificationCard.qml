@@ -26,7 +26,7 @@ GlassSurface {
 
     width: 352
     height: Math.max(66, col.implicitHeight + 24)
-    radius: 22
+    radius: Theme.metrics.widgetRadius
     material: Glass.Regular
     shadowScale: 0.8
     shadowOffsetY: 6
@@ -88,7 +88,7 @@ GlassSurface {
     // Close button (on hover)
     Rectangle {
         visible: hov.hovered
-        x: -6; y: -6; width: 20; height: 20; radius: 10
+        x: -6; y: -6; width: 20; height: 20; radius: width / 2
         color: Theme.dark ? "#3a3a3c" : "#f0f0f2"
         border.width: 0.5; border.color: Theme.controlBorder
         Symbol { anchors.centerIn: parent; width: 10; height: 10; name: "x"; weight: Symbol.Bold; color: Theme.secondaryLabel }

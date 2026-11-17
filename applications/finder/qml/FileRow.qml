@@ -18,7 +18,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent; anchors.leftMargin: 8; anchors.rightMargin: 8
-        radius: 6
+        radius: Theme.metrics.controlRadius
         color: row.selected ? Theme.selection : (drop.containsDrag ? Theme.controlFillPressed : "transparent")
     }
     readonly property color fg: selected ? "white" : Theme.label

@@ -24,7 +24,7 @@ T.Popup {
         NumberAnimation { property: "scale"; from: 0.9; to: 1; duration: Motion.normal; easing.type: Easing.Bezier; easing.bezierCurve: Motion.emphasized }
         NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Motion.fast } } }
     exit: Transition { NumberAnimation { property: "opacity"; to: 0; duration: Motion.instant } }
-    background: GlassSurface { radius: 18; material: Glass.Thin; backdrop: (ql.parent && ql.parent.Window.window && ql.parent.Window.window.lumenBackdrop) || null }
+    background: GlassSurface { radius: Theme.metrics.windowRadius; material: Glass.Thin; backdrop: (ql.parent && ql.parent.Window.window && ql.parent.Window.window.lumenBackdrop) || null }
     contentItem: Item {
         Keys.onSpacePressed: ql.close()
         Keys.onEscapePressed: ql.close()

@@ -14,7 +14,7 @@ T.ToolTip {
     y: -implicitHeight - 6
     contentItem: LText { text: control.text; style: LText.Callout; wrapMode: Text.Wrap; elide: Text.ElideNone }
     background: GlassSurface {
-        radius: 8; material: Glass.Thin
+        radius: Theme.metrics.hoverRadius; material: Glass.Thin
         backdrop: (control.parent && control.parent.Window.window && control.parent.Window.window.lumenBackdrop) ? control.parent.Window.window.lumenBackdrop : null
         shadowScale: 0.5; shadowOffsetY: 3
     }

@@ -16,7 +16,7 @@ Item {
     implicitHeight: detail.length ? 48 : 38
 
     Rectangle {
-        anchors.fill: parent; anchors.margins: 2; radius: 8
+        anchors.fill: parent; anchors.margins: 2; radius: Theme.metrics.hoverRadius
         color: Theme.controlFill
         visible: row.clickable && ma.containsMouse
     }
@@ -26,7 +26,7 @@ Item {
         spacing: 9
         Rectangle {
             visible: row.symbol.length > 0
-            width: 22; height: 22; radius: 6
+            width: 22; height: 22; radius: Theme.metrics.controlRadius
             color: row.symbolTint
             anchors.verticalCenter: parent.verticalCenter
             Symbol { anchors.centerIn: parent; width: 14; height: 14; name: row.symbol; weight: Symbol.Fill; color: "white" }

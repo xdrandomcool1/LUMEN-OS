@@ -85,7 +85,7 @@ AppWindow {
                 required property int index
                 width: list.width; height: 24
                 readonly property bool sel: row.model.pid === win.selectedPid
-                Rectangle { anchors.fill: parent; anchors.leftMargin: 8; anchors.rightMargin: 8; radius: 6
+                Rectangle { anchors.fill: parent; anchors.leftMargin: 8; anchors.rightMargin: 8; radius: Theme.metrics.controlRadius
                             color: row.sel ? Theme.selection : (row.index % 2 ? Theme.controlFill : "transparent") }
                 Row {
                     x: 12; height: parent.height
@@ -160,7 +160,7 @@ AppWindow {
         id: confirm
         visible: false
         anchors.centerIn: parent
-        width: 360; height: 150; radius: 16
+        width: 360; height: 150; radius: Theme.metrics.windowRadius
         color: Theme.dark ? "#2c2c2e" : "white"; border.width: 0.5; border.color: Theme.controlBorder
         Column {
             anchors.fill: parent; anchors.margins: 16; spacing: 12
@@ -177,7 +177,7 @@ AppWindow {
         id: info
         visible: false
         anchors.right: parent.right; anchors.rightMargin: 16; y: win.toolbarHeight + 10
-        width: 320; height: infoCol.implicitHeight + 28; radius: 14
+        width: 320; height: infoCol.implicitHeight + 28; radius: Theme.metrics.cardRadius
         color: Theme.dark ? "#2c2c2e" : "white"; border.width: 0.5; border.color: Theme.controlBorder
         readonly property var d: win.selectedPid > 0 ? procs.details(win.selectedPid) : ({})
         Column {

@@ -67,7 +67,7 @@ Window {
         implicitWidth: row.implicitWidth + 20
         Rectangle {
             anchors.fill: parent; anchors.topMargin: 3; anchors.bottomMargin: 3
-            radius: 6
+            radius: Theme.metrics.menuItemRadius
             color: win.darkText ? Qt.rgba(0, 0, 0, 0.12) : Qt.rgba(1, 1, 1, 0.22)
             opacity: bi.open || ma.pressed ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: Motion.instant } }
@@ -133,6 +133,11 @@ Window {
                 text: modelData.title
                 onClicked: x => ShellState.openMenu("appmenu-" + index, x, AppMenu.items(index))
             }
+        }
+        BarItem {
+            menuId: "window"
+            text: qsTr("Window")
+            onClicked: x => ShellState.openMenu("window", x, MenuDefinitions.windowMenu())
         }
     }
 

@@ -52,7 +52,7 @@ AppWindow {
             model: tabs
             delegate: Rectangle {
                 required property int index
-                width: (tabBar.width - (tabs.count - 1) * 4) / tabs.count; height: 26; radius: 7
+                width: (tabBar.width - (tabs.count - 1) * 4) / tabs.count; height: 26; radius: Theme.metrics.hoverRadius
                 color: index === win.currentTab ? Qt.rgba(1, 1, 1, Theme.dark ? 0.12 : 0.6) : Qt.rgba(1, 1, 1, Theme.dark ? 0.04 : 0.25)
                 LText { anchors.centerIn: parent; width: Math.min(implicitWidth, parent.width - 36); text: stack.itemAt(index) ? stack.itemAt(index).title : ""; style: LText.Callout }
                 Symbol { x: 8; anchors.verticalCenter: parent.verticalCenter; width: 10; height: 10; name: "x"; weight: Symbol.Bold; color: Theme.secondaryLabel

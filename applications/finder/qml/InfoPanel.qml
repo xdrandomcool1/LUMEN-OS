@@ -17,7 +17,7 @@ T.Popup {
     height: col.implicitHeight + 32
     padding: 16
     focus: true
-    background: GlassSurface { radius: 18; material: Glass.Regular; backdrop: (ip.parent && ip.parent.Window.window && ip.parent.Window.window.lumenBackdrop) || null }
+    background: GlassSurface { radius: Theme.metrics.windowRadius; material: Glass.Regular; backdrop: (ip.parent && ip.parent.Window.window && ip.parent.Window.window.lumenBackdrop) || null }
     contentItem: Column {
         id: col
         spacing: 10

@@ -43,7 +43,7 @@ AppWindow {
     GlassSurface {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom; anchors.bottomMargin: 18
-        width: Math.min(parent.width - 40, 560); height: 70; radius: 24
+        width: Math.min(parent.width - 40, 560); height: 70; radius: Theme.metrics.windowRadius
         material: Glass.Dark; compositorBlur: false
         opacity: show.value; visible: opacity > 0.01
         Column {

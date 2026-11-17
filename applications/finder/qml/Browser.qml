@@ -222,7 +222,7 @@ FocusScope {
         property string text
         function show(t) { text = t; opacity = 1; toastTimer.restart() }
         anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom; anchors.bottomMargin: 30
-        width: toastText.implicitWidth + 30; height: 34; radius: 17
+        width: toastText.implicitWidth + 30; height: 34; radius: height / 2
         color: Theme.dark ? "#3a3a3c" : "#ffffff"; border.width: 0.5; border.color: Theme.controlBorder
         opacity: 0; visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: Motion.normal } }

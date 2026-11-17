@@ -23,11 +23,11 @@ Window {
         onFrozenReady: { selector.showFullScreen() }
         onFailed: { errorText.text = shot.error; bar.visible = true }
     }
-    WindowEffects { window: bar; radius: 22; blurBehind: true }
+    WindowEffects { window: bar; radius: Theme.metrics.widgetRadius; blurBehind: true }
 
     GlassSurface {
         anchors.fill: parent; anchors.margins: 6
-        radius: 22; material: Glass.Regular; compositorBlur: true
+        radius: Theme.metrics.widgetRadius; material: Glass.Regular; compositorBlur: true
         Row {
             anchors.centerIn: parent; spacing: 6
             ToolbarButton { symbol: "x-circle"; tooltip: qsTr("Close"); onClicked: Qt.quit() }
@@ -47,7 +47,7 @@ Window {
         visible: thumb.status === Image.Ready && thumbTimer.running
         width: 220; height: 140; color: "transparent"
         flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-        Rectangle { anchors.fill: parent; radius: 10; color: Theme.windowBackground; border.width: 1; border.color: Theme.controlBorder; clip: true
+        Rectangle { anchors.fill: parent; radius: Theme.metrics.hoverRadius; color: Theme.windowBackground; border.width: 1; border.color: Theme.controlBorder; clip: true
             Image { id: thumb; anchors.fill: parent; anchors.margins: 4; fillMode: Image.PreserveAspectFit; asynchronous: true }
             MouseArea { anchors.fill: parent; onClicked: shot.openLast() } }
         Timer { id: thumbTimer; interval: 5000 }

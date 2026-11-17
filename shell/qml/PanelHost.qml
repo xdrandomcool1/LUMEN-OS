@@ -28,7 +28,7 @@ Window {
 
     //! Rect (window coordinates) of the panel currently shown.
     property rect activeRect: Qt.rect(0, 0, 0, 0)
-    property real activeRadius: 20
+    property real activeRadius: Theme.metrics.panelRadius
     //! Material of the panel currently shown (for compositor glass).
     property int activeMaterial: Glass.Regular
 
@@ -144,13 +144,26 @@ Window {
         // ---- Spotlight ------------------------------------------------
         Spotlight {
             id: spotlight
-            shown: win.panel.startsWith("spotlight") || win.panel === "launchpad"
+            shown: win.panel.startsWith("spotlight")
             initialQuery: win.panel.startsWith("spotlight:") ? win.panel.substring(10) : ""
             anchors.horizontalCenter: parent.horizontalCenter
             y: Math.round(win.height * 0.22)
             backdrop: win.glassBackdrop
             compositorBlur: win.glassCompositor
-            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, 400); win.activeRadius = 27; win.activeMaterial = Glass.Frosted }
+            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, 400); win.activeRadius = Theme.metrics.panelRadius; win.activeMaterial = Glass.Frosted }
+        }
+
+        // ---- Launchpad -------------------------------------------------
+        // Full-screen app grid: the blur comes from the shared wallpaper
+        // backdrop, not from compositor glass (activeRect stays empty, KWin
+        // keeps normal compositing under the scrim).
+        Launchpad {
+            id: launchpad
+            shown: win.panel === "launchpad"
+            anchors.fill: parent
+            backdrop: win.glassBackdrop
+            compositorBlur: win.glassCompositor
+            onShownChanged: if (shown) win.activeRect = Qt.rect(0, 0, 0, 0)
         }
 
         // ---- Notification Center --------------------------------------
@@ -162,7 +175,7 @@ Window {
             height: win.height - y - 10
             backdrop: win.glassBackdrop
             compositorBlur: win.glassCompositor
-            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, height); win.activeRadius = 22; win.activeMaterial = Glass.Regular }
+            onShownChanged: if (shown) { win.activeRect = Qt.rect(x, y, width, height); win.activeRadius = Theme.metrics.panelRadius; win.activeMaterial = Glass.Regular }
         }
     }
 }

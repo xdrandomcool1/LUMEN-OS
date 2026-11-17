@@ -155,7 +155,7 @@ Item {
         width: parent.width
         height: Math.min(440, list.contentHeight + 16)
         visible: results.count > 0
-        radius: 24
+        radius: Theme.metrics.panelRadius
         material: Glass.Frosted
         backdrop: sp.backdrop
         compositorBlur: sp.compositorBlur
@@ -178,7 +178,7 @@ Item {
                 text: section; style: LText.Caption; font.weight: Font.DemiBold; secondary: true
                 leftPadding: 10; topPadding: 6; bottomPadding: 2
             }
-            highlight: Rectangle { radius: 10; color: Theme.selection }
+            highlight: Rectangle { radius: Theme.metrics.hoverRadius; color: Theme.selection }
             add: Transition { NumberAnimation { properties: "opacity"; from: 0; to: 1; duration: Motion.fast } }
             delegate: Item {
                 id: res
@@ -198,7 +198,7 @@ Item {
                 Rectangle {
                     visible: res.icon.length === 0
                     x: 10; anchors.verticalCenter: parent.verticalCenter
-                    width: 28; height: 28; radius: 7
+                    width: 28; height: 28; radius: width / 4
                     color: res.current ? Qt.rgba(1, 1, 1, 0.25) : Theme.controlFillPressed
                     Symbol { anchors.centerIn: parent; width: 17; height: 17; name: res.symbol; weight: Symbol.Fill; color: res.current ? "white" : Theme.label }
                 }

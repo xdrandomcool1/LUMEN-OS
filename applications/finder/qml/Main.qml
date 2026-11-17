@@ -65,7 +65,7 @@ AppWindow {
             model: tabs
             delegate: Rectangle {
                 required property int index
-                width: (tabBar.width - (tabs.count - 1) * 4) / tabs.count; height: 28; radius: 8
+                width: (tabBar.width - (tabs.count - 1) * 4) / tabs.count; height: 28; radius: Theme.metrics.hoverRadius
                 color: index === win.currentTab ? Theme.controlFillPressed : Theme.controlFill
                 LText { anchors.centerIn: parent; text: tabsRepeater.itemAt(index) ? tabsRepeater.itemAt(index).model.title : ""; width: Math.min(implicitWidth, parent.width - 40) }
                 Symbol { anchors.left: parent.left; anchors.leftMargin: 8; anchors.verticalCenter: parent.verticalCenter; width: 11; height: 11; name: "x"; weight: Symbol.Bold; color: Theme.secondaryLabel

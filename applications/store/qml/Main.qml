@@ -53,14 +53,14 @@ AppWindow {
         property var app
         readonly property bool installed: Flatpak.isInstalled(app.appId) || app.installed === true
         readonly property bool busy: Flatpak.busyApp === app.appId
-        width: 300; height: 76; radius: 14
+        width: 300; height: 76; radius: Theme.metrics.cardRadius
         color: Theme.dark ? Qt.rgba(1, 1, 1, 0.05) : "white"
         border.width: 0.5; border.color: Theme.controlBorder
         Image {
             id: icon
             x: 12; anchors.verticalCenter: parent.verticalCenter; width: 52; height: 52
             source: card.app.icon || Flatpak.iconFor(card.app.appId); sourceSize: Qt.size(104, 104); asynchronous: true
-            Rectangle { anchors.fill: parent; radius: 12; color: Theme.controlFillPressed; visible: icon.status !== Image.Ready
+            Rectangle { anchors.fill: parent; radius: Theme.metrics.cardRadius; color: Theme.controlFillPressed; visible: icon.status !== Image.Ready
                 Symbol { anchors.centerIn: parent; width: 26; height: 26; name: "package"; color: Theme.secondaryLabel } }
         }
         Column {
@@ -111,7 +111,7 @@ AppWindow {
                     model: Flatpak.installed
                     Rectangle {
                         required property var modelData
-                        width: col.width; height: 56; radius: 12
+                        width: col.width; height: 56; radius: Theme.metrics.cardRadius
                         color: Theme.dark ? Qt.rgba(1, 1, 1, 0.04) : "white"; border.width: 0.5; border.color: Theme.controlBorder
                         Image { x: 12; anchors.verticalCenter: parent.verticalCenter; width: 36; height: 36; source: modelData.icon; sourceSize: Qt.size(72, 72) }
                         Column { x: 60; anchors.verticalCenter: parent.verticalCenter

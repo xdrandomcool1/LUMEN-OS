@@ -268,10 +268,10 @@ GlassSurface {
                         property bool asking: false
                         Item {
                             width: parent.width; height: 32
-                            Rectangle { anchors.fill: parent; radius: 8; color: rowArea.containsMouse ? Theme.controlFill : "transparent" }
+                            Rectangle { anchors.fill: parent; radius: Theme.metrics.hoverRadius; color: rowArea.containsMouse ? Theme.controlFill : "transparent" }
                             Rectangle {
                                 x: 4; anchors.verticalCenter: parent.verticalCenter
-                                width: 24; height: 24; radius: 12
+                                width: 24; height: 24; radius: width / 2
                                 color: netRow.modelData.active ? Theme.accent : (Theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.08))
                                 Symbol { anchors.centerIn: parent; width: 14; height: 14; weight: Symbol.Fill
                                          name: netRow.modelData.strength > 66 ? "wifi-high" : netRow.modelData.strength > 33 ? "wifi-medium" : "wifi-low"
@@ -319,9 +319,9 @@ GlassSurface {
                     delegate: Item {
                         required property var model
                         width: parent.width; height: 32
-                        Rectangle { anchors.fill: parent; radius: 8; color: devArea.containsMouse ? Theme.controlFill : "transparent" }
+                        Rectangle { anchors.fill: parent; radius: Theme.metrics.hoverRadius; color: devArea.containsMouse ? Theme.controlFill : "transparent" }
                         Rectangle {
-                            x: 4; anchors.verticalCenter: parent.verticalCenter; width: 24; height: 24; radius: 12
+                            x: 4; anchors.verticalCenter: parent.verticalCenter; width: 24; height: 24; radius: width / 2
                             color: model.Connected ? Theme.accent : (Theme.dark ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(0, 0, 0, 0.08))
                             Symbol { anchors.centerIn: parent; width: 14; height: 14; name: "bluetooth"; weight: Symbol.Fill; color: model.Connected ? "white" : Theme.label }
                         }
@@ -329,7 +329,7 @@ GlassSurface {
                         LText { anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter
                                 text: model.Connected ? qsTr("Connected") : ""; secondary: true; style: LText.Caption }
                         MouseArea { id: devArea; anchors.fill: parent; hoverEnabled: true
-                            onClicked: { if (model.Connected) model.Device.disconnectFromDevice(); else model.Device.connectToDevice() } }
+                            onClicked: { if (!model.Device) return; if (model.Connected) model.Device.disconnectFromDevice(); else model.Device.connectToDevice() } }
                     }
                 }
             }
@@ -353,7 +353,7 @@ GlassSurface {
                     delegate: Item {
                         required property var modelData
                         width: parent.width; height: 30
-                        Rectangle { anchors.fill: parent; radius: 8; color: outArea.containsMouse ? Theme.controlFill : "transparent" }
+                        Rectangle { anchors.fill: parent; radius: Theme.metrics.hoverRadius; color: outArea.containsMouse ? Theme.controlFill : "transparent" }
                         Symbol { x: 6; anchors.verticalCenter: parent.verticalCenter; width: 16; height: 16; name: "speaker-high"; weight: Symbol.Fill; color: Theme.label }
                         LText { x: 30; anchors.verticalCenter: parent.verticalCenter; text: modelData.description; width: parent.width - 60 }
                         Symbol { visible: modelData.active; anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter

@@ -15,7 +15,7 @@ Column {
     Rectangle {
         width: root.width
         height: box.implicitHeight
-        radius: 10
+        radius: Theme.metrics.cardRadius
         color: Theme.dark ? Qt.rgba(1, 1, 1, 0.045) : Qt.rgba(1, 1, 1, 0.75)
         border.width: 0.5
         border.color: Theme.dark ? Qt.rgba(1, 1, 1, 0.07) : Qt.rgba(0, 0, 0, 0.07)

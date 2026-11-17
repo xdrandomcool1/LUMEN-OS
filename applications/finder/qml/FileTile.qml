@@ -17,7 +17,7 @@ Item {
 
     Rectangle {
         anchors.horizontalCenter: icon.horizontalCenter; anchors.verticalCenter: icon.verticalCenter
-        width: 76; height: 76; radius: 10
+        width: 76; height: 76; radius: Theme.metrics.hoverRadius
         color: Theme.controlFillPressed
         visible: tile.selected || drop.containsDrag
     }

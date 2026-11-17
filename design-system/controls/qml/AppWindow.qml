@@ -30,7 +30,7 @@ Window {
     readonly property alias contentArea: contentArea
     readonly property alias lumenBackdrop: blur
     readonly property bool maximized: visibility === Window.Maximized || visibility === Window.FullScreen
-    readonly property real cornerRadius: maximized ? 0 : Theme.metrics.toolbarWindowRadius
+    readonly property real cornerRadius: maximized ? 0 : Theme.metrics.windowRadius
     readonly property real sidebarInset: 8
 
     flags: Qt.Window | Qt.FramelessWindowHint

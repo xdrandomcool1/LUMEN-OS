@@ -28,7 +28,9 @@ public:
     bool isDark() const;
 
     static constexpr qreal kTitleHeight = 32;
-    static constexpr qreal kRadius = 12;
+    // Matches Theme.metrics.windowRadius (16) — one corner scale for the
+    // whole system, macOS-27 style.
+    static constexpr qreal kRadius = 16;
 
 private:
     void updateLayout();

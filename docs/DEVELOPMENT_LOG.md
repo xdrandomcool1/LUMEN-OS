@@ -89,3 +89,7 @@ the ISO's own kernel/initrd were also booted with `console=ttyS0` and
 | 2 | Live user auto-logged in; `startlumen` → KWin on DRM, lumend indexing and serving `org.lumen.Search`, LUMEN gestures plugin loaded | — |
 | 2 | `lumen-shell` skipped by its ExecCondition: startplasma-wayland resets `XDG_CURRENT_DESKTOP=KDE` | `LUMEN_SESSION` marker exported to the systemd user manager before startplasma |
 | 2 | Initrd contains the LUMEN Plymouth theme, `script.so`, DRM renderer, `Theme=lumen` | — |
+| 3 | Full desktop reached (menu bar, widgets, dynamic wallpaper, Dock) but: stock Breeze decoration, blank pinned Dock icons, KDE Welcome Center autostarted | see run 4 |
+| 4 | Root cause of the first two: `kdeglobals` named `org.lumen.desktop`, which did not exist, so Plasma wrote the Fedora global theme defaults into `~/.config/kdedefaults` (outranks `/etc/xdg`): decoration → Breeze, icon theme → breeze (no LUMEN app icons) | real look-and-feel package `org.lumen.desktop` with matching defaults; app icons also in hicolor; `plasma-welcome` removed and its kded module disabled; splash disabled; Firefox pinned by its real id `org.mozilla.firefox.desktop` |
+| 4 | Verified by booting the rebuilt ISO and opening Finder via Spotlight (QMP key events): LUMEN traffic-light decoration, all pinned icons rendered, no Welcome Center (`docs/screenshots/iso-boot-finder.png`) | — |
+| 4 | Open: a Finder window started from Spotlight shows as a second Dock tile instead of lighting up the pinned one | to investigate |

@@ -70,7 +70,7 @@
         <package name="mesa-dri-drivers"/>
         <package name="mesa-vulkan-drivers"/>
         <package name="mesa-va-drivers"/>
-        <package name="intel-media-driver"/>
+        <package name="libva-intel-media-driver"/>
         <package name="libva-utils"/>
         <package name="mokutil"/>
         <package name="xorg-x11-server-Xwayland"/>

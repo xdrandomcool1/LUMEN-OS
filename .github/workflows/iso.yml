@@ -47,7 +47,7 @@ jobs:
           mkdir -p out/visual
           scripts/dev.sh scripts/build.sh --no-tests
           for s in controls-gallery glass-materials liquid-glass icon-grid; do
-            scripts/dev.sh scripts/xrun.sh ./build/lumen-qmlgrab tests/visual/$s.qml out/visual/$s.png --size 1440x900
+            scripts/dev.sh scripts/xrun.sh ./build/tests/tools/lumen-qmlgrab tests/visual/$s.qml out/visual/$s.png --size 1440x900
           done
 
       - name: Upload visual QA artifacts

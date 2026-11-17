@@ -22,6 +22,8 @@ Item {
     property bool live: true
     //! Hide the source from the visible scene (backdrop-only items).
     property bool hideSource: false
+    //! Set to false to stop rendering the pyramid entirely (software tier).
+    property bool active: true
 
     //! Blurred backdrop texture (half resolution).
     readonly property alias texture: out4
@@ -41,9 +43,9 @@ Item {
 
     ShaderEffectSource {
         id: level0
-        sourceItem: root.source
+        sourceItem: root.active ? root.source : null
         textureSize: Qt.size(Math.ceil(root.fullW), Math.ceil(root.fullH))
-        live: root.live
+        live: root.live && root.active
         hideSource: root.hideSource
         smooth: true
         visible: false
@@ -57,10 +59,11 @@ Item {
         property real offset: root.strength
         // Rendered only into its ShaderEffectSource (hideSource), never on screen.
         x: 0; y: 0
+        visible: root.active
     }
 
     component Out: ShaderEffectSource {
-        live: root.live
+        live: root.live && root.active
         hideSource: true
         smooth: true
         visible: false

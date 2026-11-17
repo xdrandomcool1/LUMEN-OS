@@ -28,6 +28,8 @@ QVariantMap Glass::material(int material, bool dark, const QColor &accent) const
         {QStringLiteral("specular"), dark ? p.specular * 0.8f : p.specular},
         {QStringLiteral("shadow"), dark ? p.shadow * 1.4f : p.shadow},
         {QStringLiteral("shadowRadius"), p.shadowRadius},
+        {QStringLiteral("frost"), p.frost},
+        {QStringLiteral("ior"), p.ior},
     };
 }
 

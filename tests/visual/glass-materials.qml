@@ -6,7 +6,7 @@ import Lumen.Glass
 Item {
     id: root
     width: 1440; height: 900
-    property string wallpaper: "file:///src/build/wp-preview/lumen-dusk.jpg"
+    property string wallpaper: "file:///src/build/wallpapers/lumen-dusk.jpg"
 
     Image { id: wall; anchors.fill: parent; source: root.wallpaper; fillMode: Image.PreserveAspectCrop; smooth: true }
     BackdropBlur { id: blur; source: wall }

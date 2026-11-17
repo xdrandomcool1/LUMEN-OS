@@ -30,6 +30,9 @@ Item {
     property real shadowOffsetY: 6
     property real refractionScale: 1.0
     property real specularScale: 1.0
+    //! Added to the material's frost (0 = clear Liquid Glass, 1 = frosted).
+    //! Use a positive bias behind dense text, e.g. 0.3.
+    property real frostBias: 0
     //! 0..1 press glow (bind to a Spring for interactive glass).
     property real pressed: 0
     //! Optional tint override; alpha < 0 keeps the material tint.
@@ -73,7 +76,12 @@ Item {
         blending: true
 
         readonly property bool inScene: root.backdrop !== null && !root._opaqueFallback
-        property var backdrop: root.backdrop ? (root.blurred ? root.backdrop.texture : root.backdrop.sharp) : dummyBackdrop
+        property var backdrop: root.backdrop ? root.backdrop.texture : dummyBackdrop
+        property var sharpBackdrop: root.backdrop ? root.backdrop.sharp : dummyBackdrop
+        // Clear glass shows the sharp backdrop through the lens; frosted
+        // materials (and Reduce Transparency) lean on the blur pyramid.
+        property real frost: !root.blurred ? 0 : (root._opaqueFallback ? 1 : Math.max(0, Math.min(1, root.params.frost + root.frostBias)))
+        property real ior: root.params.ior
         property size itemSize: Qt.size(width, height)
         property rect shape: Qt.rect(root._pad, root._pad, root.width, root.height)
         property real radius: root.radius

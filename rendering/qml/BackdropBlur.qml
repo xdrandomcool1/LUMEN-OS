@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// GPU blur pyramid for a backdrop item (dual-Kawase, 4 down + 4 up passes).
+// GPU blur pyramid for a backdrop item (dual-Kawase, 4 down + 4 up passes),
+// plus the unblurred backdrop at full resolution for clear Liquid Glass.
 //
 // One BackdropBlur is shared by every GlassSurface in a window: the expensive
 // part (blurring the backdrop) is done once per frame where the backdrop
-// changes, not once per glass surface. The source is rendered at half
-// resolution; with live updates the pyramid only re-renders when the backdrop
+// changes, not once per glass surface. The source is captured once at full
+// resolution (sampled directly by clear glass, which refracts it) and the
+// pyramid starts at quarter resolution from that capture; with live updates the pyramid only re-renders when the backdrop
 // subtree is dirty, so a static desktop costs no GPU time.
 import QtQuick
+import QtQuick.Window
 
 Item {
     id: root
@@ -22,9 +25,13 @@ Item {
 
     //! Blurred backdrop texture (half resolution).
     readonly property alias texture: out4
-    //! Unblurred backdrop texture (for "clear" glass).
+    //! Unblurred backdrop texture at full resolution (for clear glass).
     readonly property alias sharp: level0
 
+    readonly property real dpr: Screen.devicePixelRatio > 0 ? Screen.devicePixelRatio : 1
+    readonly property real fullW: Math.max(2, (source ? source.width : 2) * dpr)
+    readonly property real fullH: Math.max(2, (source ? source.height : 2) * dpr)
+    //! Half-resolution size: the pyramid's output size.
     readonly property real srcW: Math.max(2, (source ? source.width : 2) / 2)
     readonly property real srcH: Math.max(2, (source ? source.height : 2) / 2)
 
@@ -35,7 +42,7 @@ Item {
     ShaderEffectSource {
         id: level0
         sourceItem: root.source
-        textureSize: Qt.size(Math.ceil(root.srcW), Math.ceil(root.srcH))
+        textureSize: Qt.size(Math.ceil(root.fullW), Math.ceil(root.fullH))
         live: root.live
         hideSource: root.hideSource
         smooth: true
@@ -60,8 +67,8 @@ Item {
         wrapMode: ShaderEffectSource.ClampToEdge
     }
 
-    // Downsample: 1/2 → 1/4 → 1/8 → 1/16 → 1/32
-    Pass { id: d1; source: level0; width: Math.ceil(root.srcW / 2); height: Math.ceil(root.srcH / 2); fragmentShader: "qrc:/lumen/shaders/kawase_down.frag.qsb"; scaleDiv: 2 }
+    // Downsample: full → 1/4 → 1/8 → 1/16 → 1/32
+    Pass { id: d1; source: level0; width: Math.ceil(root.srcW / 2); height: Math.ceil(root.srcH / 2); fragmentShader: "qrc:/lumen/shaders/kawase_down.frag.qsb"; scaleDiv: 4 * root.dpr }
     Out { id: o1; sourceItem: d1; textureSize: Qt.size(d1.width, d1.height) }
     Pass { id: d2; source: o1; width: Math.ceil(d1.width / 2); height: Math.ceil(d1.height / 2); fragmentShader: "qrc:/lumen/shaders/kawase_down.frag.qsb"; scaleDiv: 2 }
     Out { id: o2; sourceItem: d2; textureSize: Qt.size(d2.width, d2.height) }

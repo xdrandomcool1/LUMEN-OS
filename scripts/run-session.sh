@@ -13,6 +13,7 @@
 #   --size WxH        virtual output size (default 1440x900)
 #   --scale S         output scale (default 1)
 #   --appearance M    light | dark | auto
+#   --wallpaper NAME  static wallpaper from the collection (default: dynamic set)
 #   --exec CMD        start a client (repeatable; build binaries are on PATH)
 #   --panel NAME      open a shell panel before capturing (spotlight, …)
 #   --dbus CMD        run a shell command against the session bus before capture
@@ -30,7 +31,7 @@ if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
     exec dbus-run-session -- "$0" "$@"
 fi
 
-COMPOSITOR=kwin; SIZE=1440x900; SCALE=1; APPEARANCE=dark; WAIT=6; PANEL=""; INTERACTIVE=0
+COMPOSITOR=kwin; SIZE=1440x900; SCALE=1; APPEARANCE=dark; WALLPAPER=""; WAIT=6; PANEL=""; INTERACTIVE=0
 EXECS=(); SHOTS=(); DBUSCMDS=(); CAPTURES=()
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -38,6 +39,7 @@ while [ $# -gt 0 ]; do
         --size) SIZE=$2; shift 2;;
         --scale) SCALE=$2; shift 2;;
         --appearance) APPEARANCE=$2; shift 2;;
+        --wallpaper) WALLPAPER=$2; shift 2;;
         --exec) EXECS+=("$2"); shift 2;;
         --panel) PANEL=$2; shift 2;;
         --dbus) DBUSCMDS+=("$2"); shift 2;;
@@ -94,6 +96,9 @@ cat > "$XDG_CONFIG_HOME/lumen/lumenrc" <<CFG
 [Appearance]
 mode=$APPEARANCE
 CFG
+if [ -n "$WALLPAPER" ]; then
+    printf '[Wallpaper]\nimage=%s\ndynamic=\n' "$WALLPAPER" >> "$XDG_CONFIG_HOME/lumen/lumenrc"
+fi
 printf '[Icons]\nTheme=Lumen\n' > "$XDG_CONFIG_HOME/kdeglobals"
 
 # Software rendering in containers; dev-only permission bypasses so that

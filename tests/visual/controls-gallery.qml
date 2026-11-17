@@ -7,7 +7,7 @@ Rectangle {
     id: root
     width: 900; height: 560
     color: Theme.windowBackground
-    property string wallpaper: "file:///src/build/wp-preview/lumen-dusk.jpg"
+    property string wallpaper: "file:///src/build/wallpapers/lumen-dusk.jpg"
     Image { id: wall; x: 470; y: 0; width: 430; height: 560; source: root.wallpaper; fillMode: Image.PreserveAspectCrop }
     BackdropBlur { id: blur; source: wall }
 

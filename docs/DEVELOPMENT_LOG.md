@@ -89,3 +89,24 @@ the ISO's own kernel/initrd were also booted with `console=ttyS0` and
 | 2 | Live user auto-logged in; `startlumen` → KWin on DRM, lumend indexing and serving `org.lumen.Search`, LUMEN gestures plugin loaded | — |
 | 2 | `lumen-shell` skipped by its ExecCondition: startplasma-wayland resets `XDG_CURRENT_DESKTOP=KDE` | `LUMEN_SESSION` marker exported to the systemd user manager before startplasma |
 | 2 | Initrd contains the LUMEN Plymouth theme, `script.so`, DRM renderer, `Theme=lumen` | — |
+
+## Liquid Glass refraction (2026-11-17)
+
+The glass composite looked like frosted glass: every material sampled the
+blurred pyramid with a heavy tint, and the rim only nudged samples outward.
+`shaders/glass.frag` now models a slab with a convex-squircle bevel
+(`h(x) = T·(1 − (1 − x)⁴)^¼`) and refracts an orthogonal view ray with
+Snell's law (`refract()`, IOR 1.5, per-channel IOR for dispersion) to find
+the backdrop sample, so the rim magnifies and bends the content behind it
+while the centre stays clear. `BackdropBlur` captures the backdrop once at
+full resolution (`sharp`), and each material's new `frost` mixes sharp →
+blurred. Schlick Fresnel replaces the milky inner glow. Verified with
+`tests/visual/liquid-glass.qml` (stripes/text backdrop) and live shell
+captures (`run-session.sh --wallpaper lumen-dusk|peaks`).
+
+| Problem | Resolution |
+|---|---|
+| `docker build scripts/devcontainer` fails ("open Dockerfile") | README passes `-f …/Containerfile` |
+| ~120 Qt "non-existent target KF6::* / X11::X11" CMake warnings | shared KF6 packages found at top-level scope |
+| White menu-bar text on light wallpapers in dark appearance | transparent bar picks text colour from wallpaper luminance only |
+| Glass in `xvfb`/offscreen QA renders nothing | visual QA must run through `scripts/xrun.sh` (Mesa GL); `offscreen` uses the software scene graph without shaders |

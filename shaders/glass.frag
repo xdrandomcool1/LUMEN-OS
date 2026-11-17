@@ -1,11 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // LUMEN Liquid Glass composite.
 //
-// Layers (back to front): soft shadow → refracted, saturated, blurred backdrop
-// → adaptive tint → specular rim + bevel light → (optional) contrast outline.
-// The shape is a rounded rectangle with "continuous" (superelliptic) corners,
-// evaluated as a signed distance field so every effect is resolution
-// independent and anti-aliased.
+// The glass is modelled as a thin slab lying on the backdrop whose edge is a
+// convex bevel. Inside the bevel the surface height follows a "convex
+// squircle" profile h(x) = T·(1 − (1 − x)⁴)^¼ (x = distance from the rim
+// across the bevel, 0…1), which keeps the transition into the flat centre
+// smooth. Each pixel shoots an orthogonal view ray into the surface, bends it
+// with Snell's law (refract(), n = 1 → IOR) and follows it through the glass
+// to the backdrop plane; the hit point is what we sample. That makes the rim
+// magnify and bend the content behind it while the flat centre stays clear —
+// the defining look of Liquid Glass, as opposed to frosted glass, which only
+// blurs. Red/green/blue use slightly different IORs (dispersion).
+//
+// Layers (back to front): soft shadow → refracted backdrop (sharp, or mixed
+// toward the blurred pyramid by `frost`) → adaptive tint → Fresnel
+// reflection + specular rim → (optional) contrast outline. The shape is a
+// rounded rectangle with "continuous" (superelliptic) corners, evaluated as a
+// signed distance field so every effect is resolution independent and
+// anti-aliased.
+//
+// References: Snell–Descartes refraction with a convex-squircle bezel as
+// described in "Liquid Glass in the Browser: Refraction with CSS and SVG"
+// (kube.io); SDF shapes after Inigo Quilez.
 #version 440
 layout(location = 0) in vec2 qt_TexCoord0;
 layout(location = 0) out vec4 fragColor;
@@ -33,8 +49,11 @@ layout(std140, binding = 0) uniform buf {
     float outline;       // increase-contrast outline alpha
     float dark;          // 1 in dark appearance
     float pressed;       // 0..1 interactive "press" glow
+    float frost;         // 0: clear (sharp backdrop) … 1: fully frosted (blurred)
+    float ior;           // index of refraction of the glass (≈1.5)
 };
-layout(binding = 1) uniform sampler2D backdrop;
+layout(binding = 1) uniform sampler2D backdrop;       // blurred pyramid output
+layout(binding = 2) uniform sampler2D sharpBackdrop;  // unblurred backdrop
 
 float cornerNorm(vec2 q, float n)
 {
@@ -61,13 +80,40 @@ vec2 shapeNormal(vec2 p, vec2 halfSize, float r, float n)
     return q.x > q.y ? vec2(s.x, 0.0) : vec2(0.0, s.y);
 }
 
-vec3 sampleBackdrop(vec2 px)
+// Backdrop at item pixel px; `f` blends sharp (0) → blurred (1).
+vec3 sampleBackdrop(vec2 px, float f)
 {
     vec2 uv = backdropRect.xy + (px / itemSize) * backdropRect.zw;
-    return texture(backdrop, uv).rgb;
+    vec3 s = texture(sharpBackdrop, uv).rgb;
+    vec3 b = texture(backdrop, uv).rgb;
+    return mix(s, b, f);
 }
 
 float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+
+// Convex squircle bezel profile (unit height) and its slope, x in 0…1.
+float bezelHeight(float x)
+{
+    float u = 1.0 - clamp(x, 0.0, 1.0);
+    return pow(max(1.0 - u * u * u * u, 0.0), 0.25);
+}
+float bezelSlope(float x)
+{
+    // d/dx (1 − u⁴)^¼ = u³ (1 − u⁴)^−¾ ; clamp keeps the rim finite.
+    float u = 1.0 - clamp(x, 0.004, 1.0);
+    float k = max(1.0 - u * u * u * u, 1e-4);
+    return u * u * u * pow(k, -0.75);
+}
+
+// Lateral offset (px) of a view ray refracted at a surface with normal N
+// that then travels `depth` px through the glass to the backdrop plane.
+vec2 refractOffset(vec3 N, float eta, float depth)
+{
+    vec3 T = refract(vec3(0.0, 0.0, -1.0), N, eta);
+    if (dot(T, T) < 1e-6) // total internal reflection cannot happen entering glass; guard anyway
+        return vec2(0.0);
+    return T.xy * (depth / max(-T.z, 0.2));
+}
 
 void main()
 {
@@ -100,21 +146,43 @@ void main()
     if (coverage > 0.0) {
         vec2 nrm = shapeNormal(p, halfSize, r, n);
         float inside = max(-d, 0.0);
-        float lw = max(min(lensWidth, r), 1.0);
+        // Keep a flat, undistorted centre even on small shapes.
+        float lw = max(min(min(lensWidth, r), 0.6 * min(halfSize.x, halfSize.y)), 1.0);
         float t = clamp(1.0 - inside / lw, 0.0, 1.0);      // 1 at rim, 0 past bevel
         float bevel = pow(t, 1.7);                            // convex bevel profile
 
         float lit = dot(nrm, -lightDir);                    // >0 facing the light
         vec3 col;
         float alpha;
+        // 3D surface normal of the bevel: the surface rises inward, so the
+        // normal tilts outward by the profile's slope (thickness / bezel).
+        float x = clamp(inside / lw, 0.0, 1.0);
+        float thick = max(refraction, 0.0);
+        float slope = thick / lw * bezelSlope(x);
+        vec3 N = normalize(vec3(nrm * slope, 1.0));
+        float fresnelCos = N.z; // cos of the angle between view ray and normal
         if (hasBackdrop > 0.5) {
-            // Refraction: sample outward along the normal; the bevel bends
-            // the backdrop beyond the edge into the rim, like thick glass.
-            vec2 disp = nrm * refraction * bevel;
+            // Refraction (Snell): follow the bent view ray through the glass
+            // to the backdrop. The convex bevel bends rays inward, so the rim
+            // magnifies and curves the content behind it; the flat centre
+            // (slope 0) passes the backdrop through undistorted.
+            float depth = thick * bezelHeight(x) + 0.35 * thick;
+            float etaG = 1.0 / max(ior, 1.0001);
+            float dIor = 0.045 * dispersion;
+            vec2 offG = refractOffset(N, etaG, depth);
+            vec2 offR = refractOffset(N, 1.0 / (ior - dIor), depth);
+            vec2 offB = refractOffset(N, 1.0 / (ior + dIor), depth);
+            // Exaggerate the per-channel split a little: physically correct
+            // dispersion at these IORs is sub-pixel.
+            offR = offG + (offR - offG) * 6.0;
+            offB = offG + (offB - offG) * 6.0;
+            // The bevel scatters a little light: soften it slightly more
+            // than the centre so the rim reads as thick glass, not a decal.
+            float f = clamp(frost + 0.3 * pow(1.0 - x, 2.0) * (1.0 - frost), 0.0, 1.0);
             vec3 c;
-            c.r = sampleBackdrop(px + disp * (1.0 + dispersion)).r;
-            c.g = sampleBackdrop(px + disp).g;
-            c.b = sampleBackdrop(px + disp * (1.0 - dispersion)).b;
+            c.r = sampleBackdrop(px + offR, f).r;
+            c.g = sampleBackdrop(px + offG, f).g;
+            c.b = sampleBackdrop(px + offB, f).b;
             float L = luma(c);
             c = mix(vec3(L), c, saturation) * brightness;
             // Adaptive tint: the further the backdrop is from the tint's
@@ -132,16 +200,20 @@ void main()
         }
 
         // Bevel shading: light side brightens, far side darkens subtly.
-        float shade = bevel * (0.10 * max(lit, 0.0) - 0.06 * max(-lit, 0.0));
+        float shade = bevel * (0.06 * max(lit, 0.0) - 0.05 * max(-lit, 0.0));
         col = clamp(col + vec3(shade) * (dark > 0.5 ? 0.6 : 1.0), 0.0, 1.0);
+
+        // Fresnel (Schlick, F0 = 0.04 for n ≈ 1.5): the steep bevel reflects
+        // a soft, bright environment, strongest on the side facing the
+        // light. The flat centre (normal facing the viewer) reflects ~4 %,
+        // so it stays clear.
+        float fres = 0.04 + 0.96 * pow(1.0 - clamp(fresnelCos, 0.0, 1.0), 5.0);
+        vec3 env = dark > 0.5 ? vec3(0.78, 0.80, 0.86) : vec3(1.0);
+        float envAmt = fres * specular * (0.45 + 0.35 * max(lit, 0.0));
+        col = mix(col, env, clamp(envAmt, 0.0, 0.85));
 
         // Specular rim: a crisp 1–1.5 px highlight concentrated where the
         // rim faces the light, plus a fainter counter-highlight opposite.
-        // Inner glow: light scattered inside the bevel, strongest on the lit
-        // edge — gives the surface its thickness.
-        float glowBand = (1.0 - smoothstep(0.0, lw * 0.9, inside));
-        float innerGlow = glowBand * glowBand * (0.10 + 0.14 * max(lit, 0.0) + 0.06 * max(-lit, 0.0)) * specular;
-        col = 1.0 - (1.0 - col) * (1.0 - vec3(innerGlow));
         float rimW = 1.6;
         float rim = 1.0 - smoothstep(0.0, rimW, inside);
         float spec = rim * (0.22 + 0.78 * pow(max(lit, 0.0), 1.6));

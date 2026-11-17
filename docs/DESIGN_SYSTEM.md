@@ -75,35 +75,59 @@ Window controls: close `#FF5F57`, minimize `#FEBC2E`, zoom `#28C840`
 
 ## 4. Liquid Glass materials
 
-A glass surface is rendered in five ordered layers:
+Liquid Glass is *clear* glass that bends light, not frosted glass that
+blurs it. The surface is modelled as a thin slab lying on the backdrop whose
+rounded edge is a convex bevel, and a glass surface is rendered in five
+ordered layers (`shaders/glass.frag`):
 
-1. **Backdrop** – the content behind the surface, blurred with a dual-Kawase
-   filter (radius set per material) and slightly saturated (vibrancy).
-2. **Lensing / refraction** – near the rounded edge the backdrop is sampled
-   along the surface normal, displaced by `refraction · f(d)` where `d` is the
-   signed distance to the edge and `f` a smooth convex-lens profile. A small
-   per-channel offset adds chromatic dispersion.
+1. **Backdrop** – the content behind the surface, captured once per window at
+   full resolution (`BackdropBlur.sharp`) plus a dual-Kawase blur pyramid
+   (`BackdropBlur.texture`). Each material's **frost** (0…1) mixes between the
+   two: clear materials show the sharp backdrop, frosted ones the blur. The
+   bevel always adds a little extra softening so the rim reads as thick glass.
+2. **Refraction (lensing)** – inside the bevel (width *lens*) the surface
+   height follows a convex squircle, `h(x) = T·(1 − (1 − x)⁴)^¼`, where `x` is
+   the distance from the rim across the bevel and `T` the glass thickness
+   (*refr*). Every pixel refracts an orthogonal view ray with Snell's law
+   (`refract()`, air → IOR ≈ 1.5) at the bevel's 3D normal and follows it
+   through the glass to the backdrop plane. The convex bevel bends rays
+   inward, so the rim magnifies and curves what is behind it; the flat centre
+   passes the backdrop through undistorted. Red/green/blue use slightly
+   different IORs (chromatic dispersion, exaggerated ×6 so it is visible).
+   The bevel is limited to 60 % of the shape's half size so small shapes keep
+   a clear centre.
 3. **Tint** – a material color mixed in with an *adaptive* opacity: the shader
    measures backdrop luminance and pushes it towards the material's target
-   luminance so text stays legible on any wallpaper.
-4. **Specular + rim light** – a directional highlight band on the edge facing
-   the light (top-left by default) and a thinner counter-highlight on the
-   opposite edge; plus a soft inner glow.
+   luminance so text stays legible on any wallpaper. Clear materials use very
+   little tint.
+4. **Fresnel + specular** – Schlick Fresnel (F₀ = 0.04) reflects a soft bright
+   environment on the steep bevel, strongest on the side facing the light;
+   a crisp directional rim highlight (top-left by default) and a thinner
+   counter-highlight on the opposite edge.
 5. **Shadow** – an outer, very soft ambient shadow + a tighter contact shadow
    (drawn as a separate SDF pass outside the surface).
 
-| Material      | Blur | Saturation | Tint (light / dark)          | Tint α | Refraction | Specular | Use                          |
-|---------------|------|------------|------------------------------|--------|-----------|----------|------------------------------|
-| `ultraThin`   | 18   | 1.6        | #FFFFFF / #1C1C1E            | 0.08   | 0.9       | 0.9      | Dock, floating controls      |
-| `thin`        | 24   | 1.5        | #F8F8FA / #222224            | 0.22   | 0.7       | 0.7      | Menus, popovers              |
-| `regular`     | 30   | 1.4        | #F2F2F5 / #202022            | 0.42   | 0.55      | 0.55     | Control Center, Notification |
-| `frosted`     | 44   | 1.25       | #EFEFF2 / #1A1A1C            | 0.62   | 0.35      | 0.4      | Sidebars, Spotlight results  |
-| `dark`        | 30   | 1.3        | #0E0E10                      | 0.55   | 0.55      | 0.45     | HUDs, OSD, login             |
-| `light`       | 30   | 1.3        | #FFFFFF                      | 0.55   | 0.55      | 0.6      | Light-only floating panels   |
-| `floating`    | 22   | 1.55       | #FFFFFF / #2A2A2C            | 0.16   | 1.0       | 1.0      | Spotlight field, toolbar pills|
-| `active`      | 22   | 1.55       | accent                       | 0.30   | 0.8       | 0.9      | Selected/pressed glass       |
+Surfaces without an in-scene backdrop (e.g. the Dock while a window overlaps
+it) cannot refract: they fall back to tint + light over the compositor's
+blur.
 
-Accessibility: *Reduce transparency* replaces layers 1–2 with an opaque tint;
+Values from `rendering/src/materials.h` (refr/lens in px):
+
+| Material      | Frost | Tint α | Refr (T) | Lens | Dispersion | Specular | Use                           |
+|---------------|-------|--------|----------|------|------------|----------|-------------------------------|
+| `ultraThin`   | 0.00  | 0.02   | 22       | 20   | 0.60       | 1.00     | Dock, floating controls (clear) |
+| `thin`        | 0.25  | 0.08   | 16       | 16   | 0.45       | 0.90     | Menus, popovers               |
+| `regular`     | 0.40  | 0.12   | 16       | 16   | 0.35       | 0.80     | Control Center, widgets, notifications |
+| `frosted`     | 1.00  | 0.40   | 10       | 12   | 0.20       | 0.60     | Sidebars, Spotlight results   |
+| `dark`        | 0.60  | 0.42   | 14       | 14   | 0.30       | 0.65     | HUDs, OSD, login              |
+| `light`       | 0.60  | 0.38   | 14       | 14   | 0.30       | 0.80     | Light-only floating panels    |
+| `floating`    | 0.05  | 0.03   | 24       | 24   | 0.65       | 1.00     | Spotlight field, toolbar pills |
+| `active`      | 0.30  | 0.30   | 14       | 14   | 0.40       | 0.95     | Selected/pressed glass        |
+
+`GlassSurface.frostBias` shifts a single surface toward frosted (e.g. behind
+dense text) without changing its material.
+
+Accessibility: *Reduce transparency* forces frost = 1 and an opaque tint;
 *Increase contrast* adds a 1 px `label·30%` border and raises tint α by 0.25.
 
 ## 5. Motion

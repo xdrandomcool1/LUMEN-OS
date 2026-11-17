@@ -32,7 +32,7 @@ jobs:
           sudo docker image prune --all --force || true
           df -h /
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build the Fedora 45 dev container
         run: docker build -t lumen-dev:45 -f scripts/devcontainer/Containerfile scripts/devcontainer
@@ -41,7 +41,8 @@ jobs:
         run: scripts/build-rpms.sh
 
       - name: Build the ISO
-        run: iso/build-iso.sh
+        # out/ is root-owned after the containerised RPM build.
+        run: sudo --preserve-env=CONTAINER_RUNTIME iso/build-iso.sh
 
       - name: Collect
         id: iso
@@ -67,5 +68,15 @@ jobs:
           Check the download with \`sha256sum -c SHA256SUMS\`."
           flags="--prerelease"
           [ "${GITHUB_REF_TYPE}" = "tag" ] && flags=""
-          gh release create "$tag" ${{ steps.iso.outputs.file }} out/iso/SHA256SUMS \
+          assets="${{ steps.iso.outputs.file }}"
+          # Release assets must be < 2 GiB: split larger images.
+          if [ "$(stat -c %s "$assets")" -ge 2100000000 ]; then
+            split -b 1900M -d "$assets" "$assets.part"
+            assets=$(ls "$assets".part*)
+            notes="$notes
+
+          The ISO is split into parts (GitHub's 2 GiB file limit). Join them first:
+          \`cat $(basename "${{ steps.iso.outputs.file }}").part* > $(basename "${{ steps.iso.outputs.file }}")\`"
+          fi
+          gh release create "$tag" $assets out/iso/SHA256SUMS \
             --target "${GITHUB_SHA}" --title "LUMEN OS 1.0 (${tag})" --notes "$notes" $flags

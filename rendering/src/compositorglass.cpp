@@ -7,6 +7,7 @@
 #include <QDBusPendingReply>
 #include <QJsonDocument>
 #include <QPointer>
+#include <QTimer>
 
 namespace Lumen {
 
@@ -30,11 +31,28 @@ public:
 
     void probe()
     {
+        if (m_probing)
+            return;
+        m_probing = true;
         auto msg = QDBusMessage::createMethodCall(kService, kPath, kInterface, QStringLiteral("Available"));
-        auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(msg, 2000), this);
+        // KWin can be slow to answer while the session starts (first frames,
+        // software rendering); do not give up after one short call.
+        auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(msg, 15000), this);
         connect(watcher, &QDBusPendingCallWatcher::finished, this, [this](QDBusPendingCallWatcher *w) {
+            m_probing = false;
             QDBusPendingReply<bool> reply = *w;
-            setAvailable(!reply.isError() && reply.value());
+            const bool ok = !reply.isError() && reply.value();
+            setAvailable(ok);
+            if (ok) {
+                m_retryDelay = 1000;
+            } else if (reply.isError() && reply.error().type() != QDBusError::UnknownObject
+                       && reply.error().type() != QDBusError::UnknownMethod) {
+                // KWin not up yet, or busy: retry with backoff (≤ 60 s).
+                // UnknownObject means KWin answered but the effect is not
+                // loaded; its Started signal will tell us when it is.
+                QTimer::singleShot(m_retryDelay, this, &Probe::probe);
+                m_retryDelay = qMin(m_retryDelay * 2, 60000);
+            }
             w->deleteLater();
         });
     }
@@ -59,6 +77,9 @@ private Q_SLOTS:
     }
 
 private:
+    bool m_probing = false;
+    int m_retryDelay = 1000;
+
     Probe()
     {
         QDBusConnection::sessionBus().connect(QString(), kPath, kInterface, QStringLiteral("Started"), this, SLOT(onStarted()));
@@ -164,13 +185,14 @@ void CompositorGlass::send()
                                  : QStringLiteral("[]");
     auto msg = QDBusMessage::createMethodCall(kService, kPath, kInterface, QStringLiteral("SetShapes"));
     msg << m_scope << m_output << json;
-    auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(msg, 2000), this);
+    auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(msg, 15000), this);
     QPointer<CompositorGlass> self(this);
     connect(watcher, &QDBusPendingCallWatcher::finished, this, [self](QDBusPendingCallWatcher *w) {
         if (w->isError() && self) {
-            // The effect went away (disabled, compositing suspended):
-            // fall back until it announces itself again.
+            // The effect went away (disabled, compositing suspended) or
+            // KWin is busy: fall back and check again.
             Probe::instance()->setAvailable(false);
+            Probe::instance()->probe();
         }
         w->deleteLater();
     });

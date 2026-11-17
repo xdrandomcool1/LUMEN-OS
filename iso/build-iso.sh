@@ -15,7 +15,14 @@ trap 'rm -rf "$ROOT/out/kiwi"' EXIT
     -v "$ROOT":/src -v "$ROOT/out/repo":/repo:ro -v "$ROOT/out/kiwi":/work -v "$ROOT/scripts/devcontainer/extra-ca":/extra-ca:ro \
     -w /src registry.fedoraproject.org/fedora:45 bash -euxc '
         cp /extra-ca/*.crt /etc/pki/ca-trust/source/anchors/ 2>/dev/null || true; update-ca-trust
-        dnf -y -q install kiwi-cli kiwi-systemdeps-iso-media kiwi-systemdeps-bootloaders kiwi-systemdeps-filesystems
+        # kiwi < 11.1.16 (Fedora 45 GA) crashes in "system create" (KeyError: help);
+        # require the fixed update and retry with fresh metadata (stale mirrors).
+        KIWI="python3-kiwi >= 11.1.16"
+        for attempt in 1 2 3; do
+            dnf -y -q --refresh install "$KIWI" kiwi-cli kiwi-systemdeps-iso-media kiwi-systemdeps-bootloaders kiwi-systemdeps-filesystems && break
+            [ $attempt = 3 ] && exit 1; sleep 30
+        done
+        rpm -q python3-kiwi
         rm -rf /work/root /work/out
         mkdir -p /work/root/var/tmp
         # Build-environment trust anchors (TLS-intercepting proxies only);

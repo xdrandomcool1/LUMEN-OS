@@ -24,13 +24,20 @@ KVM=""; [ -e /dev/kvm ] && KVM="--device /dev/kvm"
     xorriso -osirrox on -indev "$ISO" -extract /boot/x86_64/loader/linux /tmp/linux \
             -extract /boot/x86_64/loader/initrd /tmp/initrd >/dev/null 2>&1
     LABEL=$(xorriso -indev "$ISO" -pvd_info 2>/dev/null | sed -n "s/^Volume Id *: *//p")
+    # Boot with the same live options as the GRUB menu of the ISO (the installer
+    # depends on them, e.g. the OverlayFS root base at /run/rootfsbase).
+    CFG=$(xorriso -indev "$ISO" -find / -name grub.cfg 2>/dev/null | head -1 | sed "s/^.//;s/.$//" || true)
+    xorriso -osirrox on -indev "$ISO" -extract "$CFG" /tmp/grub.cfg >/dev/null 2>&1 || true
+    LIVEARGS=$(grep -m1 -E "^[[:space:]]*linux" /tmp/grub.cfg 2>/dev/null | tr " " "\n" | grep -E "^(rd[.]|root=)" | tr "\n" " " || true)
+    [ -n "$LIVEARGS" ] || LIVEARGS="root=live:CDLABEL=$LABEL rd.live.image"
+    echo "grub.cfg: $CFG  live args: $LIVEARGS"
     cp /usr/share/edk2/ovmf/OVMF_VARS.fd /tmp/vars.fd
     ACCEL="tcg,thread=multi"; CPU="max"; [ -e /dev/kvm ] && { ACCEL=kvm; CPU=host; }
     qemu-system-x86_64 -machine q35 -accel $ACCEL -cpu $CPU -smp 4 -m 6144 \
         -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE.fd \
         -drive if=pflash,format=raw,file=/tmp/vars.fd \
         -cdrom "$ISO" -kernel /tmp/linux -initrd /tmp/initrd \
-        -append "root=live:CDLABEL=$LABEL rd.live.image console=ttyS0 systemd.journald.forward_to_console=1 systemd.log_color=0 systemd.debug_shell=/dev/ttyS1" \
+        -append "$LIVEARGS console=ttyS0 systemd.journald.forward_to_console=1 systemd.log_color=0 systemd.debug_shell=/dev/ttyS1" \
         -device virtio-vga,xres=1440,yres=900 -display none \
         -qmp unix:/tmp/qmp.sock,server,nowait -serial file:/src/out/glass-test/journal.log \
         -chardev socket,id=dbg,path=/tmp/dbg.sock,server=on,wait=off -serial chardev:dbg &

@@ -96,6 +96,12 @@ def diag():
         ("user kdeglobals", "cat /home/liveuser/.config/kdeglobals"),
         ("look-and-feel packages", "ls /usr/share/plasma/look-and-feel"),
         ("welcome center running", "pgrep -a plasma-welcome || echo no"),
+        ("kernel command line", "cat /proc/cmdline"),
+        ("installer sources (unpackfs.conf)",
+         "ls -l /dev/mapper; blkid /dev/mapper/live-base; mkdir -p /mnt/lb && mount -o ro /dev/mapper/live-base /mnt/lb"
+         " && test -x /mnt/lb/usr/bin/bash && echo LIVE-BASE-OK; umount /mnt/lb 2>/dev/null;"
+         " test -d /run/rootfsbase/usr/bin && echo ROOTFSBASE-OK || echo ROOTFSBASE-ABSENT"),
+        ("calamares", "rpm -q calamares lumen-installer; ls /etc/calamares /usr/share/calamares 2>/dev/null | head"),
     ]
     with open(f"{OUT}/diag.txt", "w") as out:
         for title, cmd in checks:

@@ -110,3 +110,35 @@ captures (`run-session.sh --wallpaper lumen-dusk|peaks`).
 | ~120 Qt "non-existent target KF6::* / X11::X11" CMake warnings | shared KF6 packages found at top-level scope |
 | White menu-bar text on light wallpapers in dark appearance | transparent bar picks text colour from wallpaper luminance only |
 | Glass in `xvfb`/offscreen QA renders nothing | visual QA must run through `scripts/xrun.sh` (Mesa GL); `offscreen` uses the software scene graph without shaders |
+
+## Compositor-side Liquid Glass and ISO delivery (2026-11-17)
+
+* **KWin effect `lumen_glass`** (`compositor/effects/glass`): before a LUMEN
+  shell surface is drawn, the already composited pixels behind each published
+  glass shape are blitted into a texture (device resolution, mip chain when
+  frosted) and drawn back through the convex-squircle bevel / Snell model. A
+  `BackgroundEffectItem` makes any damage under the glass repaint the whole
+  shape, as KWin's blur does. Shapes come from the shell over D-Bus
+  (`org.kde.KWin /org/lumen/Glass`, `Lumen.Glass.CompositorGlass`); the shell
+  then draws only tint and light. Without OpenGL compositing the previous
+  in-process / blur fallback is used.
+* **ISO in CI**: `.github/workflows/iso.yml` builds the dev container, RPMs
+  and the kiwi ISO and publishes it as a GitHub (pre-)release (ISO + SHA256SUMS;
+  images ≥ 2 GiB would be split).
+* **`scripts/qemu-glass-test.sh`** boots the ISO (OVMF, GRUB's live options,
+  journal on ttyS0, root debug shell on ttyS1), opens Terminal and Control
+  Center with QMP key events, captures screenshots and runs checks in the guest.
+
+| Problem (found by booting the ISO) | Resolution |
+|---|---|
+| KWin: `Cannot load library lumen_glass.so: undefined symbol LayerShellV1Window::staticMetaObject` | that class is not exported by libkwin; scopes are learnt from the exported `LayerShellV1Interface::surfaceCreated`; all plugin KWin symbols checked against libkwin's exports |
+| Dock icons blank (Breeze instead of Lumen) | `kdeglobals` named the look-and-feel package `org.lumen.desktop`, which did not exist; package added, skeleton `kdeglobals` for new users |
+| Plasma Welcome Center opened on first login | `/etc/xdg/plasma-welcomerc` marks it seen |
+| Calamares `unpackfs` source `/run/rootfsbase` missing | the ISO boots dmsquash-live in device-mapper mode → `/dev/mapper/live-base`; both sources listed as optional |
+| Shell stayed on the blur fallback with the effect loaded | 2 s `Available()` probe timed out while KWin started (llvmpipe); 15 s timeout + retry with backoff |
+| CI ISO step: `kiwi-ng system create` → `KeyError: 'help'` | stale mirror served kiwi 11.1.1; `build-iso.sh` requires ≥ 11.1.16 |
+| CI ISO step: `mkdir out/iso: Permission denied` | containerised RPM build leaves `out/` root-owned; ISO step runs with sudo |
+| Local ISO builds ran out of disk at the squashfs step | ~16 GB peak plus the 4.7 GB dev image; prune build caches first |
+
+Known issue: the pinned Firefox launcher shows a generic icon in the Dock
+although `firefox.png` is present in hicolor (not yet investigated).

@@ -20,7 +20,7 @@ mkdir -p "$ROOT/out/iso"
         # removed again by config.sh before the image is sealed.
         if ls /extra-ca/*.crt >/dev/null 2>&1; then cp /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /tmp/kiwi-root/var/tmp/lumen-build-ca.crt; cp /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /var/tmp/lumen-build-ca.crt; fi
         kiwi-ng --type iso system prepare --description /src/iso/lumen --root /tmp/kiwi-root --allow-existing-root
-        kiwi-ng --type iso system create --root /tmp/kiwi-root --target-dir /tmp/kiwi-out
+        kiwi-ng system create --root /tmp/kiwi-root --target-dir /tmp/kiwi-out
         cp /tmp/kiwi-out/*.iso /src/out/iso/
         cd /src/out/iso && sha256sum *.iso > SHA256SUMS'
 ls -la "$ROOT/out/iso"

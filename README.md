@@ -32,7 +32,14 @@ scripts/build.sh                                   # configure, build, run tests
 scripts/run-session.sh --compositor sway --shot out.png   # headless session + screenshot
 scripts/build-rpms.sh                              # RPMs → out/repo
 iso/build-iso.sh                                   # live/installer ISO → out/iso
+scripts/qemu-boot-test.sh                          # boot the ISO in QEMU (UEFI/OVMF), save frames
 ```
+
+The ISO is a hybrid BIOS/UEFI image (shim + GRUB, Secure Boot capable) with a
+live LUMEN session and the Calamares installer. Fedora packages are
+GPG-verified during the build; `out/iso/SHA256SUMS` lists the image checksum.
+
+A short screenshot tour is in [docs/media/lumen-os-tour.mp4](docs/media/lumen-os-tour.mp4).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md),
 [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) and the evidence-based

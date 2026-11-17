@@ -16,7 +16,7 @@
         <rpm-check-signatures>true</rpm-check-signatures>
         <bootsplash-theme>lumen</bootsplash-theme>
         <type image="iso" primary="true" flags="dmsquash" firmware="uefi"
-              volid="LUMEN-OS-1_0" publisher="LUMEN OS" mediacheck="false"
+              volid="LUMEN-OS-1_0" publisher="LUMEN OS" mediacheck="false" efifatimagesize="31"
               kernelcmdline="rhgb quiet rd.live.image">
             <bootloader name="grub2" console="console" timeout="5"/>
         </type>

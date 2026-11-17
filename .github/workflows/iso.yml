@@ -42,6 +42,21 @@ jobs:
       - name: Build the Fedora 45 dev container
         run: docker build -t lumen-dev:45 -f scripts/devcontainer/Containerfile scripts/devcontainer
 
+      - name: Visual QA scenes (headless Mesa, inside the dev container)
+        run: |
+          mkdir -p out/visual
+          scripts/dev.sh scripts/build.sh --no-tests
+          for s in controls-gallery glass-materials liquid-glass icon-grid; do
+            scripts/dev.sh scripts/xrun.sh ./build/lumen-qmlgrab tests/visual/$s.qml out/visual/$s.png --size 1440x900
+          done
+
+      - name: Upload visual QA artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-qa
+          path: out/visual/*.png
+          if-no-files-found: warn
+
       - name: Build RPMs (with tests in %check)
         run: scripts/build-rpms.sh
 

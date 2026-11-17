@@ -19,8 +19,12 @@ Window {
     width: targetScreen ? targetScreen.width : 1280
     height: Theme.metrics.menuBarHeight
 
-    readonly property bool darkText: !ShellSettings.menuBarBackground && WallpaperEngine.topLuminance > 0.62 && !Theme.dark
-                                     || (ShellSettings.menuBarBackground && !Theme.dark)
+    // With a glass strip the strip decides (it follows the appearance); a
+    // transparent bar sits directly on the wallpaper, so only the wallpaper's
+    // luminance matters — the dark appearance can still show a light
+    // wallpaper (e.g. the daytime image of a dynamic set).
+    readonly property bool darkText: ShellSettings.menuBarBackground ? !Theme.dark
+                                                                     : WallpaperEngine.topLuminance > 0.62
     readonly property color fg: darkText ? Qt.rgba(0, 0, 0, 0.85) : Qt.rgba(1, 1, 1, 0.96)
     readonly property string openMenu: ShellController.activePanel.startsWith("menu:") ? ShellController.activePanel.substring(5) : ""
 

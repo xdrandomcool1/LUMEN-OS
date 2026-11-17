@@ -12,6 +12,14 @@ include(LumenApp)
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS
     Core Gui Qml Quick QuickControls2 QuickTemplates2 ShaderTools DBus Svg Concurrent Network Test QuickTest)
+# KDE Frameworks used across subdirectories. They are found here, at the
+# top-level scope, so that their imported targets (and the ones they pull in,
+# such as X11::X11) are visible to Qt's deferred target finalizers, which run
+# in the top-level directory scope. Finding them only in subdirectories makes
+# Qt warn about "non-existent target" dependencies.
+foreach(_kf Config CoreAddons WindowSystem Service KIO)
+    find_package(KF6${_kf} REQUIRED)
+endforeach()
 qt_standard_project_setup(REQUIRES 6.8)
 qt_policy(SET QTP0004 NEW)
 

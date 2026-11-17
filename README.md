@@ -27,7 +27,7 @@ and its own code.
 Everything builds inside a Fedora 45 container that matches the target:
 
 ```sh
-docker build -t lumen-dev:45 scripts/devcontainer   # once
+docker build -t lumen-dev:45 -f scripts/devcontainer/Containerfile scripts/devcontainer   # once (podman: same)
 scripts/build.sh                                   # configure, build, run tests
 scripts/run-session.sh --compositor sway --shot out.png   # headless session + screenshot
 scripts/build-rpms.sh                              # RPMs → out/repo

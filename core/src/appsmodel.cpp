@@ -84,7 +84,7 @@ int AppsModel::matchScore(const QString &query, const QString &name, const QStri
 {
     const QString q = query.trimmed().toLower();
     if (q.isEmpty())
-        return 0;
+        return 1; // Launchpad lists every app (stable alphabetical order)
     const QString n = name.toLower();
     int score = 0;
     if (n == q) score = 1000;

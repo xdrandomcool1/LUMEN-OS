@@ -37,7 +37,7 @@ namespace Lumen {
 
 static const QString s_path = QStringLiteral("/org/lumen/Glass");
 static const QString s_interface = QStringLiteral("org.lumen.Glass");
-static constexpr int s_maxLevels = 6;
+static constexpr int s_blurLevels = 4; // 1/2 … 1/16
 
 GlassEffect::GlassEffect()
 {
@@ -51,6 +51,7 @@ GlassEffect::GlassEffect()
     }
     m_loc.mvp = m_shader->uniformLocation("modelViewProjectionMatrix");
     m_loc.texSize = m_shader->uniformLocation("texSize");
+    m_loc.blurUnit = m_shader->uniformLocation("blurUnit");
     m_loc.shape = m_shader->uniformLocation("shape");
     m_loc.radius = m_shader->uniformLocation("radius");
     m_loc.smoothness = m_shader->uniformLocation("smoothness");
@@ -270,32 +271,39 @@ void GlassEffect::render(const RenderTarget &renderTarget, const RenderViewport 
     bool frosted = false;
     for (const GlassShape &s : info.shapes)
         frosted = frosted || s.frost > 0.01f;
-    const int levels = frosted ? s_maxLevels : 1;
+    const size_t levels = frosted ? s_blurLevels + 1 : 1;
 
     GLenum format = GL_RGBA8;
     if (renderTarget.texture())
         format = renderTarget.texture()->internalFormat();
-    if (!rd.texture || rd.texture->size() != texSize || rd.texture->internalFormat() != format || rd.levels != levels) {
-        rd.framebuffer.reset();
-        rd.texture = GLTexture::allocate(format, texSize, levels);
-        if (!rd.texture) {
-            qCWarning(LUMEN_GLASS) << "Failed to allocate the backdrop texture";
-            return;
-        }
-        rd.levels = levels;
-        rd.texture->setFilter(levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-        rd.texture->setWrapMode(GL_CLAMP_TO_EDGE);
-        rd.framebuffer = std::make_unique<GLFramebuffer>(rd.texture.get());
-        if (!rd.framebuffer->valid()) {
-            qCWarning(LUMEN_GLASS) << "Failed to create the backdrop framebuffer";
-            rd.framebuffer.reset();
-            rd.texture.reset();
-            return;
-        }
-        EglContext::currentContext()->pushFramebuffer(rd.framebuffer.get());
+    if (rd.textures.size() != levels || rd.textures[0]->size() != texSize || rd.textures[0]->internalFormat() != format) {
+        rd.framebuffers.clear();
+        rd.textures.clear();
         glClearColor(0, 0, 0, 0);
-        glClear(GL_COLOR_BUFFER_BIT);
-        EglContext::currentContext()->popFramebuffer();
+        for (size_t i = 0; i < levels; ++i) {
+            const QSize size(std::max(1, texSize.width() >> i), std::max(1, texSize.height() >> i));
+            auto texture = GLTexture::allocate(format, size);
+            if (!texture) {
+                qCWarning(LUMEN_GLASS) << "Failed to allocate a backdrop texture";
+                rd.framebuffers.clear();
+                rd.textures.clear();
+                return;
+            }
+            texture->setFilter(GL_LINEAR);
+            texture->setWrapMode(GL_CLAMP_TO_EDGE);
+            auto framebuffer = std::make_unique<GLFramebuffer>(texture.get());
+            if (!framebuffer->valid()) {
+                qCWarning(LUMEN_GLASS) << "Failed to create a backdrop framebuffer";
+                rd.framebuffers.clear();
+                rd.textures.clear();
+                return;
+            }
+            EglContext::currentContext()->pushFramebuffer(framebuffer.get());
+            glClear(GL_COLOR_BUFFER_BIT);
+            EglContext::currentContext()->popFramebuffer();
+            rd.textures.push_back(std::move(texture));
+            rd.framebuffers.push_back(std::move(framebuffer));
+        }
     }
 
     // Copy what has already been composited behind the glass (all windows
@@ -303,10 +311,15 @@ void GlassEffect::render(const RenderTarget &renderTarget, const RenderViewport 
     const Region dirty = viewport.mapFromDeviceCoordinatesContained(deviceRegion) & backgroundRect;
     for (const Rect &r : dirty.rects()) {
         const Rect dst = r.translated(-backgroundRect.topLeft()).scaled(scale).rounded();
-        rd.framebuffer->blitFromRenderTarget(renderTarget, viewport, r, dst);
+        rd.framebuffers[0]->blitFromRenderTarget(renderTarget, viewport, r, dst);
     }
-    if (levels > 1)
-        rd.texture->generateMipmaps();
+    // Frost: successive half-size linear blits (a cheap box-filter pyramid).
+    for (size_t i = 1; i < levels; ++i) {
+        GLFramebuffer::pushFramebuffer(rd.framebuffers[i - 1].get());
+        rd.framebuffers[i]->blitFromFramebuffer(Rect(QPoint(0, 0), rd.textures[i - 1]->size()),
+                                                Rect(QPoint(0, 0), rd.textures[i]->size()), GL_LINEAR);
+        GLFramebuffer::popFramebuffer();
+    }
 
     GLVertexBuffer *vbo = GLVertexBuffer::streamingBuffer();
     vbo->reset();
@@ -338,7 +351,11 @@ void GlassEffect::render(const RenderTarget &renderTarget, const RenderViewport 
     m_shader->setUniform(m_loc.texSize, QVector2D(texSize.width(), texSize.height()));
     const float opacity = float(w->opacity() * data.opacity());
     m_shader->setUniform(m_loc.opacity, opacity);
-    rd.texture->bind();
+    m_shader->setUniform(m_loc.blurUnit, 1);
+    glActiveTexture(GL_TEXTURE1);
+    rd.textures.back()->bind();
+    glActiveTexture(GL_TEXTURE0);
+    rd.textures[0]->bind();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -358,6 +375,9 @@ void GlassEffect::render(const RenderTarget &renderTarget, const RenderViewport 
         vbo->draw(GL_TRIANGLES, 0, vertexCount);
     }
     glDisable(GL_BLEND);
+    glActiveTexture(GL_TEXTURE1);
+    rd.textures.back()->unbind();
+    glActiveTexture(GL_TEXTURE0);
     ShaderManager::instance()->popShader();
     vbo->unbindArrays();
 }

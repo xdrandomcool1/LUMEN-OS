@@ -27,6 +27,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 namespace KWin {
 class BackgroundEffectItem;
@@ -79,9 +80,12 @@ Q_SIGNALS:
 private:
     struct RenderData
     {
-        std::unique_ptr<KWin::GLTexture> texture;
-        std::unique_ptr<KWin::GLFramebuffer> framebuffer;
-        int levels = 1;
+        //! [0] the captured backdrop at device resolution; [1..] half-size
+        //! copies (GL_LINEAR blits) used for frosted glass. Mipmaps are not
+        //! used: on GLES KWin allocates BGRA textures for which
+        //! glGenerateMipmap is not reliable (sampling returned black).
+        std::vector<std::unique_ptr<KWin::GLTexture>> textures;
+        std::vector<std::unique_ptr<KWin::GLFramebuffer>> framebuffers;
     };
     struct WindowData
     {
@@ -101,7 +105,7 @@ private:
     std::unique_ptr<KWin::GLShader> m_shader;
     struct
     {
-        int mvp, texSize, shape, radius, smoothness, thickness, lensWidth, dispersion, ior, frost, saturation, brightness, opacity;
+        int mvp, texSize, blurUnit, shape, radius, smoothness, thickness, lensWidth, dispersion, ior, frost, saturation, brightness, opacity;
     } m_loc{};
     bool m_valid = false;
     KWin::RenderView *m_currentView = nullptr;

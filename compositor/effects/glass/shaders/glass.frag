@@ -5,7 +5,8 @@
 // surface. Tint, Fresnel and specular light are drawn by the shell itself.
 #version 140
 
-uniform sampler2D texUnit;  // captured backdrop (GL orientation, mipmapped when frosted)
+uniform sampler2D texUnit;  // captured backdrop (GL orientation)
+uniform sampler2D blurUnit; // 1/16-size copy of it (frosted glass)
 uniform vec2 texSize;       // device px
 uniform vec4 shape;         // x, y, w, h in device px, relative to the backdrop
 uniform float radius;
@@ -70,18 +71,18 @@ vec3 sampleAt(vec2 px, float f)
 {
     px = clamp(px, vec2(0.5), texSize - vec2(0.5));
     vec2 uv = vec2(px.x / texSize.x, 1.0 - px.y / texSize.y);
+    vec3 sharp = texture(texUnit, uv).rgb;
     if (f <= 0.001)
-        return textureLod(texUnit, uv, 0.0).rgb;
-    // Frost: sample the mip chain, with a small rotated kernel to hide the
-    // box-filter blockiness of the higher levels.
-    float lod = f * 5.0;
-    vec2 o = exp2(lod) * 0.6 / texSize;
-    vec3 c = textureLod(texUnit, uv, lod).rgb * 2.0;
-    c += textureLod(texUnit, uv + vec2(o.x, o.y * 0.5), lod).rgb;
-    c += textureLod(texUnit, uv + vec2(-o.x * 0.5, o.y), lod).rgb;
-    c += textureLod(texUnit, uv + vec2(-o.x, -o.y * 0.5), lod).rgb;
-    c += textureLod(texUnit, uv + vec2(o.x * 0.5, -o.y), lod).rgb;
-    return c / 6.0;
+        return sharp;
+    // Frost: the 1/16 copy, smoothed with a small rotated kernel to hide
+    // the blockiness of bilinear upsampling.
+    vec2 o = 10.0 / texSize;
+    vec3 b = texture(blurUnit, uv).rgb * 2.0;
+    b += texture(blurUnit, uv + vec2(o.x, o.y * 0.5)).rgb;
+    b += texture(blurUnit, uv + vec2(-o.x * 0.5, o.y)).rgb;
+    b += texture(blurUnit, uv + vec2(-o.x, -o.y * 0.5)).rgb;
+    b += texture(blurUnit, uv + vec2(o.x * 0.5, -o.y)).rgb;
+    return mix(sharp, b / 6.0, f);
 }
 
 void main(void)

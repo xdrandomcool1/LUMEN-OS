@@ -140,5 +140,7 @@ captures (`run-session.sh --wallpaper lumen-dusk|peaks`).
 | CI ISO step: `mkdir out/iso: Permission denied` | containerised RPM build leaves `out/` root-owned; ISO step runs with sudo |
 | Local ISO builds ran out of disk at the squashfs step | ~16 GB peak plus the 4.7 GB dev image; prune build caches first |
 
+| Frosted compositor glass (Control Center) drew uniform dark grey | on GLES KWin allocates BGRA textures for which `glGenerateMipmap` is unreliable; frost now uses a half-size blit pyramid sampled from a second texture unit |
+
 Known issue: the pinned Firefox launcher shows a generic icon in the Dock
 although `firefox.png` is present in hicolor (not yet investigated).

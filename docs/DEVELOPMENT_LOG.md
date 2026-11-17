@@ -192,3 +192,14 @@ HARDWARE_TEST_PLAN.md).
 | Glass could still sample an inactive pyramid | `BackdropBlur.active` drops the pyramid and the full-res capture |
 | pkexec needs an in-session polkit agent | polkit-kde is already a `lumen-desktop` Require (Plasma session agent) |
 | Unknown pinned launcher rendered generic | skel id fix + build-time id resolution (above) |
+
+## macOS 27 polish: consistent radii, premium icons, Launchpad, stability (2026-11-17)
+
+| Area | What changed |
+|---|---|
+| Corner radius | One scale: windows 16 (QML `windowRadius` = KWin decoration `kRadius`), panels 26, widgets/banners 22, cards/menus 12, hover plates 8, controls 6. ~25 hardcoded radii tokenized (`cardRadius`/`hoverRadius` added to Theme.metrics, `toolbarWindowRadius` removed) — the macOS-27 "consistent corner radius across the system" rule |
+| Icons | `generate_icons.py`: subtler sheen, crisper rim, selective-refraction streak, and a Qt-SVG-compatible gradient halo (Qt SVG ignores `feDropShadow`, so Dock icons used to render flat); `rsvg-convert` renders 128/256 px PNGs into the theme (real filter depth); Settings sidebar rows now use the shared `SidebarItem` control (new `chip` mode) |
+| Liquid Glass | Clearer Regular/Thin/Dark materials (frost/tintα down), inner edge glow shader layer scaled by material specular |
+| Functionality | Real Launchpad: full-screen app grid over the darkened/blurred wallpaper (Meta+A), replacing "empty Spotlight"; the menu bar gains the (previously dead) Window menu; `AppsModel.search("")` now lists every app alphabetically for the grid |
+| Stability | Activity Monitor samples nvidia-smi asynchronously (a stuck poll used to freeze the GUI thread for up to 1.5 s per tick); lumen-shell systemd unit gets `StartLimitIntervalSec=0` so a fast crash loop can't lock it out; Bluetooth device taps are null-guarded; the wallpaper engine falls back to the first image in the wallpaper directory instead of a black desktop; `Gpu::classify` extracted and unit-tested |
+| CI | The ISO workflow builds the tree, renders the visual QA scenes (controls, glass, icons) with `lumen-qmlgrab` under Xvfb/Mesa and uploads them as artifacts for review |

@@ -16,7 +16,7 @@ and its own code.
 | Design system | `Lumen.Design` (tokens, appearance, typography, symbols), `Lumen.Controls` (25 controls + window chrome) |
 | Rendering | `Lumen.Glass`: dual-Kawase blur pyramid + glass composite shader (refraction, dispersion, adaptive tint, specular rim, shadows), 8 materials |
 | Motion | `Lumen.Motion`: vsync-driven spring engine, motion tokens, reduced motion |
-| Shell | `lumen-shell`: wallpaper & widgets, menu bar (global menus), Dock, Control Center, Spotlight, notifications |
+| Shell | `lumen-shell`: wallpaper & widgets, menu bar (global menus, Window menu), Dock, Control Center, Spotlight, Launchpad, notifications |
 | Compositor | KWin 6 + LUMEN decoration, Liquid Glass effect (`lumen_glass`), gestures plugin, window-motion effect, app switcher, defaults |
 | Services | `lumend` (Rust search index), NetworkManager, BlueZ, PipeWire, UPower, PowerDevil, AccountsService, firewalld, Flatpak |
 | Apps | Finder, System Settings, Terminal, App Store, Activity Monitor, Calculator, Calendar, Text Editor, Image Viewer, Media Player, Screenshot |

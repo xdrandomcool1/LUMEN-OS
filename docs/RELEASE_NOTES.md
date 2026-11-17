@@ -6,10 +6,13 @@
   the shell, apps, login screen and installer.
 * **Fluid motion.** A spring engine driven by the display's frame clock, so
   springs advance every frame at 60, 120 or 240 Hz, with reduced-motion support.
-* **The desktop.** Transparent adaptive menu bar with global app menus,
-  magnifying Dock with launch bounce and minimize-to-icon, Control Center,
-  Spotlight (apps, files via `lumend`, settings, actions, calculator),
-  notifications and widgets.
+* **The desktop.** Transparent adaptive menu bar with global app menus and a
+  Window menu, magnifying Dock with launch bounce and minimize-to-icon,
+  Control Center, Spotlight (apps, files via `lumend`, settings, actions,
+  calculator), full-screen Launchpad app grid, notifications and widgets.
+* **Premium squircle app icons** with real depth (baked shadows, specular
+  streaks, selective refraction) and one consistent corner-radius scale across
+  windows, panels, menus and controls.
 * **Apps.** Finder, System Settings, Terminal, App Store (Flatpak/Flathub),
   Activity Monitor, Calculator, Calendar, Text Editor, Image Viewer, Media
   Player and Screenshot.

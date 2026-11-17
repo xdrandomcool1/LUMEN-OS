@@ -42,15 +42,15 @@ Inter is the closest freely licensed match for the neo-grotesque system face
 | Dock padding / radius         | 6 inner, radius = (tile + 2·6) · 0.42         |
 | Dock bottom gap               | 8                                             |
 | Running indicator             | 4 × 4 dot, 3 below tile                       |
-| Window corner radius          | 16 (title bar), 24 (unified toolbar)          |
+| **Corner radius scale**       | windows 16 (QML `windowRadius` = KWin decoration), panels 26 (`panelRadius`), widgets/banners 22 (`widgetRadius`), cards 12 (`cardRadius`), menus 12 (`menuRadius`), hover plates 8 (`hoverRadius`), controls 6 (`controlRadius`) |
 | Title bar height              | 32; with toolbar 52                           |
 | Traffic lights                | Ø 12, centre spacing 20, inset 14 from left   |
-| Sidebar (inset, floating)     | width 220, inset 8, radius 18                  |
+| Sidebar (inset, floating)     | width 220, inset 8, radius = window radius − 8 |
 | Control Center                | width 324, padding 12, module radius 20, gap 12 |
-| Spotlight                     | width 680, field height 54, radius 27 (capsule) |
+| Spotlight                     | width 680, field height 54 (capsule), results panel radius 26 |
 | Notification banner           | width 352, radius 22, padding 14               |
 | Widgets                       | small 164², medium 344 × 164, radius 22        |
-| App icon grid (squircle)      | superellipse n = 5, 82 % content box           |
+| App icon grid (squircle)      | superellipse n = 5, 82 % content box; SVG + 128/256 px PNG (rsvg-rendered depth) |
 
 ## 3. Color
 
@@ -102,8 +102,10 @@ ordered layers (`shaders/glass.frag`):
    little tint.
 4. **Fresnel + specular** – Schlick Fresnel (F₀ = 0.04) reflects a soft bright
    environment on the steep bevel, strongest on the side facing the light;
-   a crisp directional rim highlight (top-left by default) and a thinner
-   counter-highlight on the opposite edge.
+   a crisp directional rim highlight (top-left by default), a thinner
+   counter-highlight on the opposite edge, and a wide *inner edge glow* just
+   inside the rim (the macOS-27 "defined" glass cue), all scaled by the
+   material's specular strength.
 5. **Shadow** – an outer, very soft ambient shadow + a tighter contact shadow
    (drawn as a separate SDF pass outside the surface).
 
@@ -124,10 +126,10 @@ Values from `rendering/src/materials.h` (refr/lens in px):
 | Material      | Frost | Tint α | Refr (T) | Lens | Dispersion | Specular | Use                           |
 |---------------|-------|--------|----------|------|------------|----------|-------------------------------|
 | `ultraThin`   | 0.00  | 0.02   | 22       | 20   | 0.60       | 1.00     | Dock, floating controls (clear) |
-| `thin`        | 0.25  | 0.08   | 16       | 16   | 0.45       | 0.90     | Menus, popovers               |
-| `regular`     | 0.40  | 0.12   | 16       | 16   | 0.35       | 0.80     | Control Center, widgets, notifications |
+| `thin`        | 0.20  | 0.08   | 16       | 16   | 0.45       | 0.90     | Menus, popovers               |
+| `regular`     | 0.32  | 0.10   | 16       | 16   | 0.35       | 0.80     | Control Center, widgets, notifications |
 | `frosted`     | 1.00  | 0.40   | 10       | 12   | 0.20       | 0.60     | Sidebars, Spotlight results   |
-| `dark`        | 0.60  | 0.42   | 14       | 14   | 0.30       | 0.65     | HUDs, OSD, login              |
+| `dark`        | 0.50  | 0.42   | 14       | 14   | 0.30       | 0.65     | HUDs, OSD, login              |
 | `light`       | 0.60  | 0.38   | 14       | 14   | 0.30       | 0.80     | Light-only floating panels    |
 | `floating`    | 0.05  | 0.03   | 24       | 24   | 0.65       | 1.00     | Spotlight field, toolbar pills |
 | `active`      | 0.30  | 0.30   | 14       | 14   | 0.40       | 0.95     | Selected/pressed glass        |

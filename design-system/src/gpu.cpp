@@ -16,21 +16,6 @@ struct Detection {
     QString renderer;
 };
 
-Gpu::Tier Gpu::classify(const QString &renderer)
-{
-    if (renderer.isEmpty())
-        return Software;
-    const QString s = renderer.toLower();
-    if (s.contains(QLatin1String("llvmpipe")) || s.contains(QLatin1String("softpipe"))
-        || s.contains(QLatin1String("swrast")) || s.contains(QLatin1String("lavapipe"))
-        || s.contains(QLatin1String("swiftshader")))
-        return Software;
-    if (s.contains(QLatin1String("virgl")) || s.contains(QLatin1String("venus"))
-        || s.contains(QLatin1String("virtio")) || s.contains(QLatin1String("svga3d")))
-        return Lite;
-    return Full;
-}
-
 Detection probeRenderer()
 {
     Detection d;
@@ -53,6 +38,21 @@ Detection probeRenderer()
 }
 
 } // namespace
+
+Gpu::Tier Gpu::classify(const QString &renderer)
+{
+    if (renderer.isEmpty())
+        return Software;
+    const QString s = renderer.toLower();
+    if (s.contains(QLatin1String("llvmpipe")) || s.contains(QLatin1String("softpipe"))
+        || s.contains(QLatin1String("swrast")) || s.contains(QLatin1String("lavapipe"))
+        || s.contains(QLatin1String("swiftshader")))
+        return Software;
+    if (s.contains(QLatin1String("virgl")) || s.contains(QLatin1String("venus"))
+        || s.contains(QLatin1String("virtio")) || s.contains(QLatin1String("svga3d")))
+        return Lite;
+    return Full;
+}
 
 Gpu::Gpu(QObject *parent)
     : QObject(parent)

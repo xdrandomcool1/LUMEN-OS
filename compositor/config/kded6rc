@@ -1,0 +1,9 @@
+# LUMEN OS: KDE daemon modules that are not part of the LUMEN experience.
+[Module-plasma_welcome]
+autoload=false
+
+[Module-kded_plasma_welcome]
+autoload=false
+
+[Module-donationmessage]
+autoload=false

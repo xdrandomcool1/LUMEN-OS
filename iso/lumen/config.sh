@@ -30,6 +30,8 @@ systemctl --global enable lumen-shell.service lumend.service || true
 # LUMEN is the only desktop session offered.
 rm -f /usr/share/wayland-sessions/plasma*.desktop /usr/share/xsessions/plasma*.desktop
 plymouth-set-default-theme lumen
+# KDE's first-run Welcome Center is not part of LUMEN (pulled in as a weak dep).
+rpm -e --nodeps plasma-welcome 2>/dev/null || true
 
 # --- Live user -------------------------------------------------------------------
 echo "liveuser ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/liveuser

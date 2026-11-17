@@ -102,6 +102,8 @@ export QT_QPA_PLATFORM=offscreen
 %{_datadir}/wayland-sessions/lumen.desktop
 %{_datadir}/dbus-1/services/org.lumen.Search.service
 %{_datadir}/icons/Lumen/
+%{_datadir}/icons/hicolor/scalable/apps/lumen-*.svg
+%{_datadir}/plasma/look-and-feel/org.lumen.desktop/
 %{_datadir}/lumen/
 %{_datadir}/backgrounds/lumen/
 %{_datadir}/color-schemes/Lumen*.colors
@@ -117,6 +119,8 @@ export QT_QPA_PLATFORM=offscreen
 %config(noreplace) %{_sysconfdir}/xdg/kdeglobals
 %config(noreplace) %{_sysconfdir}/xdg/kcminputrc
 %config(noreplace) %{_sysconfdir}/xdg/kscreenlockerrc
+%config(noreplace) %{_sysconfdir}/xdg/kded6rc
+%config(noreplace) %{_sysconfdir}/xdg/ksplashrc
 %config(noreplace) %{_sysconfdir}/xdg/lumen/
 
 %files -n lumen-apps

@@ -1,7 +1,7 @@
 add_subdirectory(tools)
 
 qt_add_executable(tst_core unit/tst_core.cpp)
-target_link_libraries(tst_core PRIVATE Qt6::Test LumenMotion LumenGlass LumenSystem)
+target_link_libraries(tst_core PRIVATE Qt6::Test LumenMotion LumenDesign LumenGlass LumenSystem)
 add_test(NAME core-unit COMMAND tst_core)
 
 find_program(QMLTESTRUNNER qmltestrunner PATHS /usr/lib64/qt6/bin)

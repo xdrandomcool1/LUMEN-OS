@@ -3,6 +3,7 @@
 #pragma once
 #include <QAbstractListModel>
 #include <QHash>
+#include <QProcess>
 #include <QTimer>
 #include <QtQml/qqmlregistration.h>
 
@@ -103,7 +104,9 @@ Q_SIGNALS:
     void updated();
 private:
     void sample();
+    void readNvidiaOutput();
     QTimer m_timer;
+    QProcess m_nvProcess;
     QString m_busyPath, m_name, m_source;
     bool m_available = false;
     qreal m_usage = 0;

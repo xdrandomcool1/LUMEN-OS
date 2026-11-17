@@ -205,6 +205,10 @@ GpuStats::GpuStats(QObject *parent) : QObject(parent)
     if (!m_available && !QStandardPaths::findExecutable(QStringLiteral("nvidia-smi")).isEmpty()) {
         m_source = QStringLiteral("nvidia-smi");
         m_available = true;
+        // nvidia-smi can take hundreds of ms; sample it asynchronously so the
+        // GUI thread never waits on the driver (a stuck poll used to freeze
+        // the whole app for up to 1.5 s per tick).
+        connect(&m_nvProcess, &QProcess::finished, this, &GpuStats::readNvidiaOutput);
     }
 }
 
@@ -212,14 +216,22 @@ void GpuStats::sample()
 {
     if (m_source == QLatin1String("amdgpu")) {
         m_usage = readAll(m_busyPath).trimmed().toDouble() / 100.0;
+        Q_EMIT updated();
     } else if (m_source == QLatin1String("nvidia-smi")) {
-        QProcess p;
-        p.start(QStringLiteral("nvidia-smi"), {QStringLiteral("--query-gpu=utilization.gpu,name"), QStringLiteral("--format=csv,noheader,nounits")});
-        if (p.waitForFinished(1500)) {
-            const QString out = QString::fromUtf8(p.readAllStandardOutput()).trimmed();
-            m_usage = out.section(QLatin1Char(','), 0, 0).trimmed().toDouble() / 100.0;
-            m_name = out.section(QLatin1Char(','), 1).trimmed();
-        }
+        // One query at a time; skip a tick if the previous one is still out.
+        if (m_nvProcess.state() == QProcess::NotRunning)
+            m_nvProcess.start(QStringLiteral("nvidia-smi"),
+                              {QStringLiteral("--query-gpu=utilization.gpu,name"),
+                               QStringLiteral("--format=csv,noheader,nounits")});
+    }
+}
+
+void GpuStats::readNvidiaOutput()
+{
+    const QString out = QString::fromUtf8(m_nvProcess.readAllStandardOutput()).trimmed();
+    if (!out.isEmpty()) {
+        m_usage = out.section(QLatin1Char(','), 0, 0).trimmed().toDouble() / 100.0;
+        m_name = out.section(QLatin1Char(','), 1).trimmed();
     }
     Q_EMIT updated();
 }

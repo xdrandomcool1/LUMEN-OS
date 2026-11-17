@@ -44,6 +44,9 @@ public:
     bool software() const { return m_tier == Software; }
     QString renderer() const { return m_renderer; }
 
+    //! Classifies a GL_RENDERER string into a tier. Pure, unit-tested.
+    static Tier classify(const QString &renderer);
+
 private:
     explicit Gpu(QObject *parent = nullptr);
 

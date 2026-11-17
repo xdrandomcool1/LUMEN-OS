@@ -3,6 +3,9 @@ Description=LUMEN desktop shell
 PartOf=graphical-session.target
 After=plasma-kwin_wayland.service
 Requires=plasma-kwin_wayland.service
+# Never lock the shell out after a fast crash loop (RestartSec=1 would hit
+# systemd's default 5-starts/10s burst limit).
+StartLimitIntervalSec=0
 
 [Service]
 ExecStart=/usr/bin/lumen-shell

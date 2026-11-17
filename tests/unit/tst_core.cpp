@@ -9,6 +9,7 @@
 #include "filesearch.h"
 #include "sysstats.h"
 #include "glass.h"
+#include "gpu.h"
 
 using namespace Lumen;
 
@@ -116,6 +117,21 @@ private Q_SLOTS:
         QVERIFY(dark.value("shadow").toReal() > light.value("shadow").toReal());
         const auto active = g.material(Glass::Active, false, QColor(255, 0, 0));
         QCOMPARE(active.value("tint").value<QVector4D>().x(), 1.0f);
+    }
+    void gpuRendererClassification()
+    {
+        using T = Gpu::Tier;
+        QCOMPARE(Gpu::classify(QStringLiteral("llvmpipe (LLVM 19.1.0, 256 bits)")), T::Software);
+        QCOMPARE(Gpu::classify(QStringLiteral("Mesa/X.org softpipe")), T::Software);
+        QCOMPARE(Gpu::classify(QStringLiteral("SwiftShader (LLVM)")), T::Software);
+        QCOMPARE(Gpu::classify(QStringLiteral("libglvnd IR swrast")), T::Software);
+        QCOMPARE(Gpu::classify(QString()), T::Software);
+        QCOMPARE(Gpu::classify(QStringLiteral("virgl (Venus)")), T::Lite);
+        QCOMPARE(Gpu::classify(QStringLiteral("virtio_gpu")), T::Lite);
+        QCOMPARE(Gpu::classify(QStringLiteral("SVGA3D; build: RELEASE")), T::Lite);
+        QCOMPARE(Gpu::classify(QStringLiteral("NVIDIA GeForce RTX 3070/PCIe/SSE2")), T::Full);
+        QCOMPARE(Gpu::classify(QStringLiteral("AMD Radeon RX 7900 XT (radeonsi navi31)")), T::Full);
+        QCOMPARE(Gpu::classify(QStringLiteral("Intel(R) Arc(TM) Graphics")), T::Full);
     }
 };
 

@@ -121,6 +121,15 @@ void WallpaperEngine::update()
     }
     if (path.isEmpty()) path = resolve(s->wallpaper());
     if (path.isEmpty()) path = resolve(m_default);
+    if (path.isEmpty()) {
+        // Last resort: the first image in the wallpaper directory, so a broken
+        // collection or wiped settings never degrade to a black desktop.
+        const QDir dir(dataDir());
+        const QStringList imgs = dir.entryList({QStringLiteral("*.png"), QStringLiteral("*.jpg"), QStringLiteral("*.webp")},
+                                               QDir::Files, QDir::Name);
+        if (!imgs.isEmpty())
+            path = dir.filePath(imgs.first());
+    }
     const QUrl url = path.isEmpty() ? QUrl() : QUrl::fromLocalFile(path);
     if (url == m_source) return;
     m_source = url;

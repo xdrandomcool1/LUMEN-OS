@@ -242,6 +242,15 @@ void main()
         col = 1.0 - (1.0 - col) * (1.0 - vec3(specA));
         alpha = max(alpha, specA);
 
+        // Inner edge glow: a wide, faint band of light just inside the rim
+        // (macOS-27 "defined" glass) — brightest on the side facing the
+        // light, scaled by the material's specular strength.
+        float band = 1.0 - smoothstep(0.0, 14.0, inside);
+        band *= band;
+        float innerGlow = clamp(band * (0.05 + 0.10 * pow(max(lit, 0.0), 1.4)) * specular, 0.0, 1.0);
+        col = 1.0 - (1.0 - col) * (1.0 - vec3(innerGlow));
+        alpha = max(alpha, innerGlow);
+
         // Interactive press: soft inner light that blooms from the center.
         if (pressed > 0.0) {
             float glow = pressed * 0.18 * (1.0 - smoothstep(0.0, max(halfSize.x, halfSize.y), length(p)));

@@ -47,6 +47,7 @@ jobs:
       - name: Collect
         id: iso
         run: |
+          sudo chown -R "$(id -u):$(id -g)" out
           cd out/iso
           ls -la
           iso=$(ls *.iso | head -1)

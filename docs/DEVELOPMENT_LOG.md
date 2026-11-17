@@ -75,3 +75,17 @@ run or screenshot produced in the dev container (`scripts/devcontainer`).
 | Fedora 45 moved GPG keys / dropped `PLATFORM_ID` | `/usr/share/pki/rpm-gpg/RPM-GPG-KEY-fedora-45-primary`; default value |
 | QML enums of C++-rooted controls are `undefined` inside JS expressions | documented in DESIGN_SYSTEM.md §6; avoided in code |
 | `.flat()`/inline component scoping/`Window.window` on popups | fixed per component |
+
+## Milestone 6 — ISO boot testing (QEMU, OVMF UEFI, software emulation)
+
+`scripts/qemu-boot-test.sh` boots the ISO with OVMF and captures frames;
+the ISO's own kernel/initrd were also booted with `console=ttyS0` and
+`systemd.journald.forward_to_console=1` to read the full system journal.
+
+| Run | Finding | Fix |
+|---|---|---|
+| 1 | UEFI → GRUB → kernel OK; GRUB warned `terminal gfxterm isn't found` | GRUB text console |
+| 1 | Greeter and session died: `pam_systemd.so` missing → no logind session, no `XDG_RUNTIME_DIR`, KWin "could not add wayland socket" | `systemd-pam` + `patternType="plusRecommended"` (weak deps as in Fedora spins) |
+| 2 | Live user auto-logged in; `startlumen` → KWin on DRM, lumend indexing and serving `org.lumen.Search`, LUMEN gestures plugin loaded | — |
+| 2 | `lumen-shell` skipped by its ExecCondition: startplasma-wayland resets `XDG_CURRENT_DESKTOP=KDE` | `LUMEN_SESSION` marker exported to the systemd user manager before startplasma |
+| 2 | Initrd contains the LUMEN Plymouth theme, `script.so`, DRM renderer, `Theme=lumen` | — |
